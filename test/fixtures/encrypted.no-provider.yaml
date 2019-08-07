@@ -1,0 +1,3 @@
+crypto:
+  key: arn:aws:kms:us-east-1:some-account:alias/some-key
+text: value

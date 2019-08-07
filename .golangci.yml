@@ -1,0 +1,20 @@
+issues:
+  exclude:
+    - ST1005
+linters:
+  fast: true
+  enable:
+    - goconst
+    - gocritic
+    - gocyclo
+    - goimports
+    - stylecheck
+    - interfacer
+    - gosec
+    - maligned
+    - misspell
+    - prealloc
+    - scopelint
+    - unconvert
+    - unparam
+

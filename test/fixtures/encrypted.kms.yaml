@@ -1,0 +1,20 @@
+boolean: true
+crypto:
+  key: arn:aws:kms:us-east-1:000000000000:key/00000000-0000-0000-0000-000000000000
+  provider: kms
+empty-list: []
+list:
+- a
+- b
+- c
+nestedList:
+- prop: true
+- prop: false
+number: 1
+object:
+  key: value
+secret:
+  ciphertext: eyJLZXkiOiJhcm46YXdzOmttczp1cy1lYXN0LTE6MDAwMDAwMDAwMDAwOmtleS8wMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDAiLCJWYWx1ZSI6IllYTmtaZz09IiwiTm9uY2UiOiIxNTYwOTAyNTc1MDE3MzcwMDAwIn0=
+  encrypted: true
+  hash: f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b
+string: value

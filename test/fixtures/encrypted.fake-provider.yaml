@@ -1,0 +1,3 @@
+crypto:
+  provider: fake-provider
+text: value

@@ -1,0 +1,34 @@
+boolean: true
+crypto:
+  key: |
+    -----BEGIN PGP MESSAGE-----
+
+    hQEMA1XMevbqrQGfAQf9HNf/afNfnMmgEGg10z5VuX+4vWt/FXgIHTSdzd+QaTtl
+    iqsv9w2pRrb0BKpdwy7JJFgUHwP9Od3XDI5I17Q9AKl7s495ou8U3uiVyykW2Fcm
+    6aL3ZBRfD62jJ8Ws0q/og79vRdAlbkxU/+OaqDWR2FeKQnZkI9O4G73trKKF2KI8
+    L1uSsa/wBU616Gq75Qb3HimIAkLnxKnUpq/E3NOxpHNLocxPeUKjIarJW3/MNlXd
+    V09FfC7fypUWpUHdex6orKH6HgeDOcxjefMdPpbA7u8Nwn4F6PLuNSjrrjFRUq3S
+    HzyFnvrxsWYxkZtx74T6nTEn0FnrkSRx4fyB6mVPjdJeAa6AwTubcHWOWZ1tHaYz
+    Bq5b+NsmowjeDhiPmiWP5peAVKUlzU7vnflHc6DLQBrOkkybi9p9mLMm/v+iGM8C
+    gI8a3zgsta9yx8ylj/+yvTTYKXxdMUUuEuAj5P1y+Q==
+    =OhLv
+    -----END PGP MESSAGE-----
+  provider: gpg
+  recipients:
+  - test-software@blinkhealth.com
+empty-list: []
+list:
+- a
+- b
+- c
+nestedList:
+- prop: true
+- prop: false
+number: 1
+object:
+  key: value
+secret:
+  ciphertext: sibTqX8Fnb+qPwtjNWHAYhcdDbdrtz1CWtnAoSiDO6+yhrcWe6pyvOB6l+2+K04YKre1GJKL
+  encrypted: true
+  hash: f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b
+string: value

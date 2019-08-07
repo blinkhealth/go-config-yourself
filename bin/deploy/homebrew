@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+# Creates a PR on blinkhealth/opensource-formulas with an updated stable version
+set -o nounset
+
+VERSION=$(cat dist/VERSION)
+if [[ $VERSION == *-* ]]; then
+  >&2 echo "Not deploying unstable build to homebrew formulas"
+  exit 0
+fi
+
+function gh () {
+  case "$1" in
+    gcy) repo="go-config-yourself" ;;
+    brew) repo="opensource-formulas" ;;
+  esac
+  set -o errexit
+  curl --silent --fail --show-error \
+    -H "Authorization: Bearer $GITHUB_TOKEN" \
+    https://api.github.com/repos/blinkhealth/$repo/$2 $*
+  set +o errexit
+}
+
+function gh_post () {
+  gh -XPOST -d@- -H'Content-type: application/json' $*
+}
+
+function gh_put () {
+  gh -XPUT -H'Content-type: application/json' $*
+}
+
+function sha() { jq -r '.sha' "$1"; }
+
+echo "Bumping to $(cat .homebrew/latest)"
+
+mkdir -p .homebrew
+# get the latest release asset url
+gh gcy releases/latest |
+  jq -r '.assets[] | select(.name == "gcy-macos-amd64.tgz") | .browser_download_url' > .homebrew/latest
+
+# Get the formula contents
+gh brew contents/go-config-yourself.rb |
+  jq -r '.content' |
+  openssl base64 -d > .homebrew/source.rb
+
+sed -E "s|url .*|url '$(cat .homebrew/latest)'|" .homebrew/source.rb > .homebrew/dest.rb
+
+if diff --brief .homebrew/source.rb .homebrew/dest.rb >/dev/null; then
+  cat .homebrew/dest.rb
+  >&2 echo "No changes to the version, refusing to create empty commit"
+  exit 0
+fi
+
+# Create the branch
+latestSha=$(gh brew git/refs/heads/master | jq -r '.object.sha')
+latestTree=$(gh brew "git/commits/$latestSha" | jq -r '.tree.sha')
+branchName="chore/bump-go-config-yourself-${VERSION//.//}"
+gh_post brew git/refs <<-JSON
+{
+  "ref": "refs/heads/$branchName",
+  "sha": "$latestSha"
+}
+JSON
+
+# create the blob
+gh_post brew git/blobs > .homebrew/blob-response.json <<-JSON
+{
+  "content": "$(openssl  base64 -A -in .homebrew/dest.rb)",
+  "encoding": "base64"
+}
+JSON
+
+# create the tree
+gh_post brew git/trees > .homebrew/tree.json <<-JSON
+{
+  "base_tree": "$latestTree",
+  "tree": [{
+    "path": "go-config-yourself.rb",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "$(sha .homebrew/blob-response.json)"
+  }]
+}
+JSON
+
+# create the commit
+gh_post brew git/commits > .homebrew/commit.json <<-JSON
+{
+  "message": "Bump go-config-yourself to $VERSION",
+  "tree": "$(sha .homebrew/tree.json)",
+  "parents": ["$latestSha"]
+}
+JSON
+
+# update our branch's HEAD
+gh brew git/commits -X PATCH -H'Content-type: application/json'<<-JSON
+{
+  "sha": "$(sha .homebrew/commit.json)",
+}
+JSON
+
+# create the pull request
+gh_post brew pulls <<-JSON
+{
+  "title": "Bump go-config-yourself to $VERSION",
+  "head": "$branchName",
+  "base": "master"
+}
+JSON
+
+rm -rf .homebrew

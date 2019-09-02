@@ -74,6 +74,11 @@ jobs:
             mv /go/pkg ~/go/
             export GOPATH="${HOME}/go"
             export PATH="$HOME/go/bin:$PATH"
+            make build
+            ./dist/gcy-linux-amd64 get bin/deploy/config.yml gpg.key > key.asc
+            gpg --pinentry-mode loopback \
+              --passphrase-file <(./dist/gcy-linux-amd64 get bin/deploy/config.yml gpg.password) \
+              --import key.asc
             make release
       - run:
           name: Update git pages

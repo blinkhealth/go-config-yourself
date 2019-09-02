@@ -27,14 +27,17 @@ buildEnv() {
     # use special compilers
     export CC=o64-clang
     export CXX=o64-clang++
+    # use special libtool and friends
+    export LIBTOOL="x86_64-apple-darwin15-libtool"
+    export AR="x86_64-apple-darwin15-ar"
+    export RANLIB="x86_64-apple-darwin15-ranlib"
     # This is where the compiled targets go
     export PREFIX=/usr/local/osx-ndk-x86/SDK/MacOSX10.11.sdk/usr
+    export PATH="/usr/local/osx-ndk-x86/bin:$PATH"
   else
     HOST=x86_64-linux
     export GPGME_HOST="$HOST"
     export PREFIX=/usr/local
-    # When building for linux, we want static libraries only, macOS are static by default i think?
-    export LIB_FLAGS="--disable-shared --enable-static"
   fi
   export HOST
 }
@@ -52,9 +55,12 @@ for target in "${targets[@]}"; do
       ./configure \
         --host="$HOST" \
         --prefix="$PREFIX" \
+        --with-gpg-error-prefix="$PREFIX" \
         --disable-doc \
         --disable-tests \
-        --disable-languages $LIB_FLAGS
+        --disable-languages \
+        --disable-dependency-tracking \
+        --enable-static --disable-shared
       make
       make install
     ) > "$lib.log" 2>&1; then

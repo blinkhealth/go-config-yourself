@@ -55,13 +55,15 @@ test-deps:
 release: build
 	$(ROOT_DIR)/bin/deploy/github
 	$(ROOT_DIR)/bin/deploy/homebrew
-	$(ROOT_DIR)/bin/deploy/ppa
 
 dist:
 	mkdir -p dist
 	./bin/build/version.sh > dist/VERSION
 
-build: dist build-deps dist/gcy-macos-amd64.tgz dist/gcy-linux-amd64.tgz
+debian:
+	$(ROOT_DIR)/bin/build/debian
+
+build: dist build-deps dist/gcy-macos-amd64.tgz dist/gcy-linux-amd64.tgz debian
 
 build-xgo: dist
 	# produce debug-symbol stripped binaries
@@ -82,14 +84,15 @@ compress-binaries:
 build-local: dist
 	mkdir -p dist/local
 	CGO=1 go build -ldflags "-s -w -X main.version=$(shell sed 's/^v//' dist/VERSION)" -o dist/local/gcy
-	upx -9 dist/local/gcy
+	# skip compression on local builds
+	# upx -9 dist/local/gcy
 
 dist/gcy-macos-amd64.tgz: docs build-xgo
 	mkdir -p dist/macos
 	cp dist/gcy-macos-amd64 dist/macos/gcy
 	cp -r bin/autocomplete dist/macos
 	cp -r dist/docs/man dist/macos
-	tar -cf dist/gcy-macos-amd64.tgz -C "$(ROOT_DIR)/dist/macos" .
+	tar -czf dist/gcy-macos-amd64.tgz -C "$(ROOT_DIR)/dist/macos" .
 	openssl dgst -sha256 dist/gcy-macos-amd64.tgz | awk '{print $$2}' > dist/gcy-macos-amd64.shasum
 	rm -rf dist/macos
 
@@ -98,7 +101,8 @@ dist/gcy-linux-amd64.tgz: docs build-xgo
 	cp dist/gcy-linux-amd64 dist/linux/gcy
 	cp -r bin/autocomplete dist/linux
 	cp -r dist/docs/man dist/linux
-	tar -cf dist/gcy-linux-amd64.tgz -C "$(ROOT_DIR)/dist/linux" .
+	cp bin/build/linux.Makefile dist/linux/Makefile
+	tar -czf dist/gcy-linux-amd64.tgz -C "$(ROOT_DIR)/dist/linux" .
 	openssl dgst -sha256 dist/gcy-linux-amd64.tgz | awk '{print $$2}' > dist/gcy-linux-amd64.shasum
 	rm -rf dist/linux
 
@@ -110,29 +114,29 @@ build-deps:
 # Documentation
 # --------------
 DOCS := $(shell find pkg/crypto -name '*.md')
-MAN_PAGES := $(patsubst pkg/crypto/%/README.md,dist/docs/man/go-config-yourself-%.5,$(DOCS))
-dist/docs/man/go-config-yourself-%.5: pkg/crypto/%/README.md
+MAN_PAGES := $(patsubst pkg/crypto/%/README.md,dist/docs/man/gcy-%.5,$(DOCS))
+dist/docs/man/gcy-%.5: pkg/crypto/%/README.md
 	mkdir -p $(@D)
 	pandoc --standalone \
 		--wrap=preserve \
 		--lua-filter './bin/docs/pandoc-filters/man.lua' \
 		--metadata 'adjusting=l' \
-		--metadata 'header=go-config-yourself' \
+		--metadata 'header=gcy' \
 		--metadata "date=$(shell cat dist/VERSION)" \
 		--metadata 'hyphenate=false' \
-		--metadata='title=go-config-yourself-$*(5) go-config-yourself help' \
+		--metadata='title=gcy-$*(5) gcy help' \
 		--to man $< -o $@
 
-dist/docs/man/go-config-yourself.1: README.md
+dist/docs/man/gcy.1: README.md
 	mkdir -p $(@D)
 	pandoc --standalone \
 		--wrap=preserve \
 		--lua-filter './bin/docs/pandoc-filters/man.lua' \
 		--metadata 'adjusting=l' \
-		--metadata 'header=go-config-yourself' \
+		--metadata 'header=gcy' \
 		--metadata "date=$(shell cat dist/VERSION)" \
 		--metadata 'hyphenate=false' \
-		--metadata='title=go-config-yourself(1) gcy help' \
+		--metadata='title=gcy(1) gcy help' \
 		--to man $< -o $@
 
 
@@ -144,8 +148,8 @@ dist/docs/html/%.html: %.md
 		--wrap=preserve \
 		--lua-filter './bin/docs/pandoc-filters/html.lua' \
 		--metadata 'hyphenate=false' \
-		--metadata pagetitle="go-config-yourself: $(patsubst .,$(subst .md,,$(notdir $<)),$(notdir $(patsubst %/,%,$(dir $<))))" \
+		--metadata pagetitle="gcy: $(patsubst .,$(subst .md,,$(notdir $<)),$(notdir $(patsubst %/,%,$(dir $<))))" \
 		--template bin/docs/template.html \
 		--to html $< -o $(@:README.html=index.html)
 
-docs: dist/docs/man/go-config-yourself.1 $(MAN_PAGES) $(HTML_PAGES)
+docs: dist/docs/man/gcy.1 $(MAN_PAGES) $(HTML_PAGES)

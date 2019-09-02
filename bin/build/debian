@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+# https://www.Edebian.org/doc/manuals/maint-guide/first.en.html#namever
+set -o errexit
+set -o nounset
+
+VERSION=$(sed 's|-|~|; s/^v//' dist/VERSION)
+PACKAGE_NAME="gcy"
+PACKAGE_LOCATION="dist/${PACKAGE_NAME}_${VERSION}"
+PACKAGE_URL="https://github.com/blinkhealth/go-config-yourself"
+PACKAGE_MAINTAINER="Blink Health opensource <opensource@blinkhealth.com>"
+
+cp dist/gcy-linux-amd64.tgz "${PACKAGE_LOCATION}.orig.tar.gz"
+mkdir -p "$PACKAGE_LOCATION"
+tar xfz "${PACKAGE_LOCATION}.orig.tar.gz" -C "$PACKAGE_LOCATION"
+
+PACKAGE_BRANCH="stable"
+if [[ "$VERSION" == *~* ]]; then
+    PACKAGE_BRANCH="unstable"
+fi
+deb="${PACKAGE_LOCATION}/debian"
+mkdir -p "${deb}"
+dir_usr="${PACKAGE_LOCATION}/usr"
+dir_share="${dir_usr}/share"
+pkg_share="${dir_share}/${PACKAGE_NAME}"
+
+function git_commits () {
+  local parentVersion diff;
+  parentVersion=$(git describe --abbrev=0 --tags --exclude "$VERSION" 2>/dev/null)
+  if [[ "$parentVersion" == "" ]]; then
+    diff=""
+  else
+    diff="$parentVersion...HEAD"
+  fi
+  git log --no-color --pretty=format:'  %s%n' "$diff" 2>/dev/null
+}
+
+# man pages
+find dist/docs/man/gcy* -type f -exec basename {} \; | sed 's/^/debian\//' > "${deb}/gcy.manpages"
+cp dist/docs/man/* "${deb}/"
+
+# license
+cat >"${deb}/copyright" <<-EOF
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: ${PACKAGE_NAME}
+Upstream-Contact: ${PACKAGE_MAINTAINER}
+Source: https://blinkhealth.github.com/go-config-yourself
+
+Files: *
+Copyright: $(head -n 1 LICENSE)
+License: Apache-2.0
+EOF
+
+# control
+# https://www.debian.org/doc/debian-policy/ch-controlfields.html#source-package-control-files-debian-control
+cat >"${deb}/control" <<-EOF
+Source: gcy
+Section: utils
+Maintainer: ${PACKAGE_MAINTAINER}
+Priority: optional
+Standards-Version: 4.4.0
+Homepage: https://blinkhealth.github.com/go-config-yourself
+Vcs-Git: https://github.com/blinkhealth/go-config-yourself.git
+Vcs-Browser: https://github.com/blinkhealth/go-config-yourself
+
+
+Package: ${PACKAGE_NAME}
+Architecture: amd64
+Description: CLI tool to deal with everyday application configuration in your repository.
+ The command line tool is an installable binary written in go that enables a
+ developer to work with encrypted values in config files.
+EOF
+
+# changelog
+# https://www.debian.org/doc/manuals/maint-guide/dreq.en.html#changelog
+cat > "${deb}/changelog" <<-EOF
+${PACKAGE_NAME} (${VERSION}) $PACKAGE_BRANCH; urgency=medium
+
+$(git_commits)
+
+ -- ${PACKAGE_MAINTAINER}  $(date -R)
+
+EOF
+
+# debuild stuff
+mkdir -p "$deb/source"
+cp bin/build/debian.Makefile "${deb}/rules"
+echo "9" > "${deb}/compat"
+echo "usr" > "${deb}/dirs"
+echo "3.0 (native)" >"$deb/source/format"
+echo "usr/bin/gcy" >"$deb/source/include-binaries"
+echo "gcy binary: statically-linked-binary" >"${deb}/source/lintian-overrides"
+
+# build binary package
+( cd "${PACKAGE_LOCATION}" && debuild -b -sa )
+mv "${PACKAGE_LOCATION}_amd64.deb" dist/gcy-linux-amd64.deb

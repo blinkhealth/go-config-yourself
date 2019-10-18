@@ -82,7 +82,6 @@ func (provider *Provider) Decrypt(encryptedBytes []byte) (string, error) {
 // Replace the key with a new one
 //
 // Will query every available AWS region and then prompt the user to select a key from it, unless `key` is present in `args`
-// Unless `AWS_AP_EAST_1_ENABLED` is set on the environment, the `ap-east-1` region will be ignored when listing keys. This region is not enabled by default (https://docs.aws.amazon.com/general/latest/gr/rande.html).
 func (provider *Provider) Replace(args map[string]interface{}) (err error) {
 	var key string
 

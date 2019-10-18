@@ -13,7 +13,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const test_secret = "asdf"
+const testSecret = "asdf"
 
 // Example usage of the package to load a file and operate on it
 func Example() {
@@ -85,11 +85,11 @@ func TestGetValues(t *testing.T) {
 				{"object.key", "value", nil},
 				{"list.0", "a", nil},
 				{"nestedList.1.prop", false, nil},
-				{"secret", test_secret, nil},
+				{"secret", testSecret, nil},
 				{"fakeValue", nil, fmt.Errorf("Could not find a value at fakeValue")},
 			}
 
-			err := c.Set("secret", []byte(test_secret))
+			err := c.Set("secret", []byte(testSecret))
 
 			if err != nil {
 				t.Fatalf("Unable to encrypt, %s", err)
@@ -200,7 +200,7 @@ func runProviderSetValue(provider string) func(t *testing.T) {
 		}
 
 		// Set encrypted values on the main tree
-		err = c.Set("secret", []byte(test_secret))
+		err = c.Set("secret", []byte(testSecret))
 		if err != nil {
 			t.Fatal(err.Error())
 		}
@@ -210,12 +210,12 @@ func runProviderSetValue(provider string) func(t *testing.T) {
 			t.Errorf("Failed to fetch new encrypted property %v", fetchErr)
 		}
 
-		if encFetch != test_secret {
+		if encFetch != testSecret {
 			t.Errorf("New encrypted property is not a string but a: %v", encFetch)
 		}
 
 		// Set encrypted values on a list index
-		err = c.Set("list.3", []byte(test_secret))
+		err = c.Set("list.3", []byte(testSecret))
 		if err != nil {
 			t.Fatal(err.Error())
 		}
@@ -225,12 +225,12 @@ func runProviderSetValue(provider string) func(t *testing.T) {
 			t.Errorf("Failed to fetch new encrypted list property %v", fetchErr)
 		}
 
-		if encListFetch != test_secret {
+		if encListFetch != testSecret {
 			t.Errorf("New encrypted list property is not a string but a: %v", encListFetch)
 		}
 
 		// Set encrypted values on a list object
-		err = c.Set("newList.1.a", []byte(test_secret))
+		err = c.Set("newList.1.a", []byte(testSecret))
 		if err != nil {
 			t.Fatal(err.Error())
 		}
@@ -240,7 +240,7 @@ func runProviderSetValue(provider string) func(t *testing.T) {
 			t.Errorf("Failed to fetch new encrypted property %v", fetchErr)
 		}
 
-		if encListObjFetch != test_secret {
+		if encListObjFetch != testSecret {
 			t.Errorf("New encrypted list property is not a string but a: %v", encListObjFetch)
 		}
 	}
@@ -262,7 +262,7 @@ func TestSetValues(t *testing.T) {
 func TestReplaceCrypto(t *testing.T) {
 	nonEnc := fx.LoadFile("plaintext", t)
 	c := fx.LoadFile("encrypted.kms", t)
-	_ = c.Set("secret", []byte(test_secret))
+	_ = c.Set("secret", []byte(testSecret))
 
 	selection := "2\n"
 	tests := []struct {
@@ -355,7 +355,7 @@ func TestGetAll(t *testing.T) {
 		provider := provider
 		t.Run(provider, func(t *testing.T) {
 			c := fx.LoadFile(fmt.Sprintf("encrypted.%s", provider), t)
-			_ = c.Set("secret", []byte(test_secret))
+			_ = c.Set("secret", []byte(testSecret))
 
 			data, err := c.GetAll()
 			if err != nil {
@@ -364,7 +364,7 @@ func TestGetAll(t *testing.T) {
 
 			plaintextValue := data["secret"]
 
-			if plaintextValue != test_secret {
+			if plaintextValue != testSecret {
 				t.Errorf("Could not decrypt plaintext, %v", plaintextValue)
 			}
 		})
@@ -378,7 +378,7 @@ func TestListAllSecrets(t *testing.T) {
 		provider := provider
 		t.Run(provider, func(t *testing.T) {
 			c := fx.LoadFile(fmt.Sprintf("encrypted.%s", provider), t)
-			_ = c.Set("secret", []byte(test_secret))
+			_ = c.Set("secret", []byte(testSecret))
 
 			secrets := c.ListSecrets()
 

@@ -90,6 +90,8 @@ func (svc *kmsService) Decrypt(encryptedBytes []byte) (string, error) {
 }
 
 // ListKeys offers a list of kms keys on all regions
+// Calls that fail with UnrecognizedClientException will be ignored, since some regions might not be enabled
+// by default (https://docs.aws.amazon.com/general/latest/gr/rande.html).
 func (svc *kmsService) ListKeys() (keys []string, err error) {
 	finished := make(chan bool, 1)
 	listingErrors := make(chan error, 1)
@@ -97,10 +99,6 @@ func (svc *kmsService) ListKeys() (keys []string, err error) {
 
 	// Query every region for their known kms keys
 	for _, region := range listRegions() {
-		if region == "ap-east-1" && os.Getenv("AWS_AP_EAST_1_ENABLED") == "" {
-			// https://docs.aws.amazon.com/general/latest/gr/rande.html
-			continue
-		}
 		region := region
 		wg.Add(1)
 		go func(region string, listingErrors chan<- error) {
@@ -110,8 +108,17 @@ func (svc *kmsService) ListKeys() (keys []string, err error) {
 			log.Debugf("Querying for keys in %s", region)
 			regionKeys, err := fetchAllKeys(client, nil)
 			if err = catchBadCredentials(err, svc.session, region); err != nil {
-				listingErrors <- fmt.Errorf("Error querying for keys in %s: %s", region, err)
-				return
+				if awsErr, ok := err.(awserr.Error); ok {
+					if awsErr.Code() != "UnrecognizedClientException" {
+						listingErrors <- err
+						return
+					} else {
+						log.Warningf("Unable to query possibly disabled region %s for keys, ignoring", region)
+					}
+				} else {
+					listingErrors <- fmt.Errorf("Error querying for keys in %s: %s", region, err)
+					return
+				}
 			}
 
 			log.Debugf("Found %d customer keys on %s", len(regionKeys), region)
@@ -176,7 +183,7 @@ func fetchAllKeys(client kmsiface.KMSAPI, nextMarker *string) (result []string, 
 }
 
 func listRegions() (regions []string) {
-	partition := endpoints.AwsPartition()
+	partition := endpoints.AwsPartition().Services()[endpoints.KmsServiceID]
 	for regionName := range partition.Regions() {
 		regions = append(regions, regionName)
 	}

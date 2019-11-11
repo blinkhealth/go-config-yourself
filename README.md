@@ -2,9 +2,9 @@
 
 [![CircleCI](https://circleci.com/gh/blinkhealth/go-config-yourself.svg?style=svg)](https://circleci.com/gh/blinkhealth/go-config-yourself)
 
-A secrets-management CLI tool and language-specific runtimes to deal with everyday application configuration right from your repository. **go-config-yourself** aims to simplify the management of secrets from your terminal and its use within application code, keeping configuration files as human-readable as possible, so change management of these files, and their secrets are easily achievable any version-control system, like git.
+A secrets-management CLI tool and language-specific runtimes to deal with everyday application configuration right from your repository. **go-config-yourself** aims to simplify the management of secrets from your terminal and its use within application code, keeping configuration files as human-readable as possible, so change management of these files and their secrets are easily achievable as a version-control system, like git.
 
-`go-config-yourself` comes with the following cryptographic providers that do the work of encrypting and decrypting secrets, along managing the keys for it:
+`go-config-yourself` comes with the following cryptographic providers that do the work of encrypting and decrypting secrets, along with managing the keys for it:
 
 - [AWS KMS](pkg/crypto/kms)
 - [GPG](pkg/crypto/gpg)
@@ -81,13 +81,13 @@ go-config-yourself init
   CONFIG_FILE
 ```
 
-Creates a YAML config file at `$(pwd)/${CONFIG_FILE}`. You may omit the key flag to have `gcy` query your provider for a list of them you can choose from. You can specify which encryption provider to use by specifying the `--provider` flag. By default, `gcy` will use the [AWS KMS](https://aws.amazon.com/kms/) service.
+Creates a YAML config file at `$(pwd)/${CONFIG_FILE}`. You may omit the key flag to have `gcy` query your provider for a list of keys to choose from. You can specify which encryption provider to use by specifying the `--provider` flag. By default, `gcy` will use the [AWS KMS](https://aws.amazon.com/kms/) service.
 
 ### Options:
 
 - `--provider value`, `-p value`: The provider to encrypt values with (value is one of: [kms](pkg/crypto/kms), [gpg](pkg/crypto/gpg), [password](pkg/crypto/password))
 - `--key value`: The kms key ARN to use
-- `--public-key value`: A gpg public key's identity: a fingerprint like or email to use as a recipient to encrypt this file's data key. This option can be entered multiple times. If no recipients are specified, a list of available keys will be printed for the user to choose from.
+- `--public-key value`: A gpg public key's identity: a fingerprint or email to use as a recipient to encrypt this file's data key. This option can be entered multiple times. If no recipients are specified, a list of available keys will be printed for the user to choose from.
 - `--password value`: A password to use for encryption and decryption, also read from the environment variable `$CONFIG_PASSWORD`. To prevent your shell from remembering the password, start your command with a space: `[space]gcy ...`
 
 ```sh
@@ -206,7 +206,7 @@ Re-encrypts all the secret values with specified arguments. By default, it will 
 
 - `--provider value`, `-p value`: The provider to encrypt values with (value is one of: [kms](pkg/crypto/kms), [gpg](pkg/crypto/gpg), [password](pkg/crypto/password))
 - `--key value`: The AWS KMS key ARN to use. If no key is specified, `gcy` will prompt the user to select it from a list.
-- `--public-key value`: A gpg public key's identity: a fingerprint like or email to use as a recipient to encrypt this file's data key. This option can be entered multiple times. If no recipients are specified, a list of available keys will be printed for the user to choose from.
+- `--public-key value`: A gpg public key's identity: a fingerprint or email to use as a recipient to encrypt this file's data key. This option can be entered multiple times. If no recipients are specified, a list of available keys will be printed for the user to choose from.
 - `--password value`: A password to use for encryption and decryption, also read from the environment variable `$CONFIG_PASSWORD`. To prevent your shell from remembering the password, start your command with a space: `[space]gcy ...`
 
 ```sh
@@ -229,7 +229,7 @@ gcy rekey config-up-there.yml arn:aws:kms:an-aws-region:an-account:alias/an-alia
 
 ## Config files
 
-Config files are [YAML](https://yaml.org/) files with nested objects representing a configuration tree. Storing encrypted values requires the presence of a `crypto` property with configuration for that provider, but the rest is up to you. `gcy` keeps keys ordered alphabetically doing a best-effort to keep comments in place. Here's a typical example of such a file, using the `kms` provider:
+Config files are [YAML](https://yaml.org/) files with nested objects representing a configuration tree. Storing encrypted values requires the presence of a `crypto` property with configuration for that provider, but the rest is up to you. `gcy` keeps keys ordered alphabetically, doing its best-effort to keep comments in place. Here's a typical example of such a file, using the `kms` provider:
 
 ```yaml
 crypto:

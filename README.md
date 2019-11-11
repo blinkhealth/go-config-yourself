@@ -2,9 +2,9 @@
 
 [![CircleCI](https://circleci.com/gh/blinkhealth/go-config-yourself.svg?style=svg)](https://circleci.com/gh/blinkhealth/go-config-yourself)
 
-A secrets-management CLI tool and language-specific runtimes to deal with everyday application configuration right from your repository. **go-config-yourself** aims to simplify the management of secrets from your terminal and its use within application code, keeping configuration files as human-readable as possible, so change management of these files, and their secrets are easily achievable any version-control system, like git.
+A secrets-management CLI tool and language-specific runtimes to deal with everyday application configuration right from your repository. **go-config-yourself** aims to simplify the management of secrets from your terminal and their use within application code. Configuration files are kept as human-readable as possible, so change management is easily achievable in any version-control system (like git).
 
-`go-config-yourself` comes with the following cryptographic providers that do the work of encrypting and decrypting secrets, along managing the keys for it:
+`go-config-yourself` comes with the following cryptographic providers that do the work of encrypting and decrypting secrets, along with managing the keys for it:
 
 - [AWS KMS](pkg/crypto/kms)
 - [GPG](pkg/crypto/gpg)
@@ -122,7 +122,7 @@ crypto:
 
 Sets a value at `KEYPATH`, prompting you for the input or reading from `stdin`. If the `crypto` property does not exist in `CONFIG_FILE` and `-p|--plain-text` is not specified, `gcy` will exit with a non-zero status code. Encrypted values read through `stdin` will be later accessible as their interpreted type by golang’s default JSON parser. This means that the string `“true”` becomes the boolean `true`. If encrypting the contents of a file, you can pass its path to the `-i|--input-file` flag and `gcy` will read from it instead of `stdin`.
 
-`set` will read up to 4096 bytes before exiting with an error, to account for AWS's KMS service limitations in this regard.
+`set` will read up to 4096 bytes before exiting with an error, to account for AWS's KMS service limitations.
 
 If a `defaults` or `default` file with the same extension as `CONFIG_FILE` exists in the same directory, `gcy` will add a nil value for `KEYPATH` in said file.
 
@@ -175,7 +175,7 @@ someSecret:
 
 `gcy get CONFIG_FILE KEYPATH`
 
-Outputs the value for `KEYPATH` in `CONFIG_FILE`. `KEYPATH` is a dot delimited path to objects. The output value will be encoded as JSON if said value is a dictionary, with all encrypted values within decrypted.
+Outputs the value for `KEYPATH` in `CONFIG_FILE`. `KEYPATH` is a dot delimited path to objects. If the output value is a dictionary it will be encoded as JSON, with all of the encrypted values within decrypted.
 
 ```sh
 gcy get config-up-there.yml some.nested.object

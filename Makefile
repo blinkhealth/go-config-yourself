@@ -37,10 +37,6 @@ integration-test: test/gcy
 test/gcy:
 	CGO=1 go build -tags test -ldflags "-X main.version=test" -o test/gcy
 
-test-deps:
-	# install outside package dir so go.sum is not affected
-	cd / && GO111MODULE=auto go get -u gotest.tools/gotestsum github.com/golangci/golangci-lint/cmd/golangci-lint
-
 coverage:
 	mkdir -p $(REPORTS)/coverage
 	mkdir -p $(REPORTS)/reports
@@ -48,6 +44,10 @@ coverage:
 	grep -vE '(go-config-yourself|commands)/[^/]+\.go' $(REPORTS)/coverage/profile > $(REPORTS)/unit.out
 	go tool cover -html=$(REPORTS)/unit.out -o=$(REPORTS)/coverage/unit.html
 	rm $(REPORTS)/unit.out
+
+test-deps:
+	# install outside package dir so go.sum is not affected
+	cd / && GO111MODULE=auto go get -u gotest.tools/gotestsum github.com/golangci/golangci-lint/cmd/golangci-lint
 
 # --------------
 # Release
@@ -62,10 +62,6 @@ dist:
 	./bin/build/version.sh > dist/VERSION
 
 build: dist build-deps dist/gcy-macos-amd64.tgz dist/gcy-linux-amd64.tgz
-
-build-deps:
-	cd / && GO111MODULE=auto go get -u src.techknowlogick.com/xgo
-	docker build --tag xgo ./bin/build/
 
 build-xgo: dist
 	# produce debug-symbol stripped binaries
@@ -106,6 +102,13 @@ dist/gcy-linux-amd64.tgz: docs build-xgo
 	openssl dgst -sha256 dist/gcy-linux-amd64.tgz | awk '{print $$2}' > dist/gcy-linux-amd64.shasum
 	rm -rf dist/linux
 
+build-deps:
+	cd / && GO111MODULE=auto go get -u src.techknowlogick.com/xgo
+	docker build --tag xgo ./bin/build/
+
+# --------------
+# Documentation
+# --------------
 DOCS := $(shell find pkg/crypto -name '*.md')
 MAN_PAGES := $(patsubst pkg/crypto/%/README.md,dist/docs/man/go-config-yourself-%.5,$(DOCS))
 dist/docs/man/go-config-yourself-%.5: pkg/crypto/%/README.md

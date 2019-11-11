@@ -81,7 +81,7 @@ go-config-yourself init
   CONFIG_FILE
 ```
 
-Creates a YAML config file at `$(pwd)/${CONFIG_FILE}`. You may omit the key flag to have `gcy` query your provider for a list of them you can choose from. You can specify which encryption provider to use by specifying the `--provider` flag. By default, `gcy` will use the [AWS KMS](https://aws.amazon.com/kms/) service.
+Creates a YAML config file at `$(pwd)/${CONFIG_FILE}`. You may omit the key flag to have `gcy` query your provider for a list of keys to can choose from. You can specify which encryption provider to use by specifying the `--provider` flag. By default, `gcy` will use the [AWS KMS](https://aws.amazon.com/kms/) service.
 
 ### Options:
 

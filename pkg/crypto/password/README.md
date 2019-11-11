@@ -17,12 +17,14 @@ zero:
   hash: 6ac095169b05c043f89c9957f097f405d683bc15531824dca61bce544682d3b2
 ```
 
-# Environment Variables
+## Environment Variables
 
-For all operations, you may set the `CONFIG_PASSWORD` environment variable and this provider will use that instead of prompting the user for the file's password.
+For all operations, you may set the `CONFIG_PASSWORD` environment variable and this provider will use that instead of prompting the user for the file's password. This is obviously **very insecure**, since the password will be available in your shell history!
 
 ```sh
-export CONFIG_PASSWORD="password"
+# a space prefixes this `export` to prevent the shell from storing
+# this password in its history file
+ export CONFIG_PASSWORD="password"
 go-config-yourself init --provider password file.yml
 # INFO[0000] Creating config at file.yml
 go-config-yourself set file.yml secret <<<"some secret"

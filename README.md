@@ -2,18 +2,28 @@
 
 [![CircleCI](https://circleci.com/gh/blinkhealth/go-config-yourself.svg?style=svg)](https://circleci.com/gh/blinkhealth/go-config-yourself)
 
-A CLI tool and language-specific runtimes to deal with everyday application configuration in your repository. The command line tool is an installable binary written in go that enables developers to work with encrypted values in config files. Prefer using `go-config-yourself` over using environment variables.
+A secrets-management CLI tool and language-specific runtimes to deal with everyday application configuration right from your repository. **go-config-yourself** aims to simplify the management of secrets from your terminal and its use within application code, keeping configuration files as human-readable as possible, so change management of these files, and their secrets are easily achievable any version-control system, like git.
 
-- [Installation](#installation)
-- [Config files](#config-files)
-- [Command Line Interface](#usage)
-- [Developing go-config-yourself](CONTRIBUTING.md)
-- Runtime libraries:
-  - [Javascript + Typescript](https://github.com/blinkhealth/config-yourself-javascript)
-  - [Python](https://github.com/blinkhealth/config-yourself-python)
-  - [Golang](pkg/file)
+`go-config-yourself` comes with the following cryptographic providers that do the work of encrypting and decrypting secrets, along managing the keys for it:
+
+- [AWS KMS](pkg/crypto/kms)
+- [GPG](pkg/crypto/gpg)
+- [Password](pkg/crypto/password) (scrypt)
+
+This repository contains code and documentation for the `gcy` command-line tool. Packaged libraries to read secrets from these files are available for these languages:
+
+- [Golang](pkg/file)
+- [Javascript + Typescript](https://github.com/blinkhealth/config-yourself-javascript)
+- [Python](https://github.com/blinkhealth/config-yourself-python)
 
 ---
+
+# gcy
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [Config files](#config-files)
+- [Developing go-config-yourself](CONTRIBUTING.md)
 
 # Installation
 
@@ -56,29 +66,6 @@ cp gcy /usr/local/bin
 
 ---
 
-## Config files
-
-A config file is a nested object written in YAML. Since we want to store encrypted values, we should add a `crypto` property with a `provider` key and configuration for that provider.
-
-The standard recommended location for config files for projects is in the `config/` directory of a repository. Start with a `config/defaults.yml` file and then add override files for each environment the application will run in. Here's a typical example of such a file, using the `kms` provider:
-
-```yaml
-crypto:
-  provider: kms
-  key: arn:aws:kms:an-aws-region:an-account:alias/an-alias
-
-# and any arbitrary yaml afterwards
-# Comments will be preserved by go-config-yourself, and all keys will be ordered
-someKey: someValue
-someObject:
-  because: We use the right datatypes and
-  wereNotCrazy: true
-  verySecret:
-    encrypted: true
-    ciphertext: "...base64-encoded string"
-    hash: "aSHA256hashOfTheSecret"
-```
-
 # Usage
 
 The command line interface is a program named `gcy` with four main commands: [`init`](#init), [`set`](#set), [`get`](#get) and [`rekey`](#rekey)
@@ -94,7 +81,7 @@ go-config-yourself init
   CONFIG_FILE
 ```
 
-Creates a YAML config file at `$(pwd)/${CONFIG_FILE}`. You can directly specify the key(s) as arguments, or choose them from a list. You can choose which encryption provider to use by specifying the `--provider` flag. By default, `gcy` will use the [AWS KMS](https://aws.amazon.com/kms/) service.
+Creates a YAML config file at `$(pwd)/${CONFIG_FILE}`. You may omit the key flag to have `gcy` query your provider for a list of them you can choose from. You can specify which encryption provider to use by specifying the `--provider` flag. By default, `gcy` will use the [AWS KMS](https://aws.amazon.com/kms/) service.
 
 ### Options:
 
@@ -116,7 +103,7 @@ gcy init config/my-first-config.yml
 # ↓   arn:aws:kms:us-east-1:an-account:alias/and-so-forth
 
 # or specify the key if you know it
-gcy init config/my-first-config.yml arn:aws:kms:an-aws-region:an-account:alias/an-alias
+gcy init config/my-first-config.yml --provider kms --key arn:aws:kms:an-aws-region:an-account:alias/an-alias
 
 cat config/my-first-config.yml
 ```
@@ -134,6 +121,8 @@ crypto:
 `gcy set [-p,--plain-text] [-i,--input-file PATH] CONFIG_FILE KEYPATH`
 
 Sets a value at `KEYPATH`, prompting you for the input or reading from `stdin`. If the `crypto` property does not exist in `CONFIG_FILE` and `-p|--plain-text` is not specified, `gcy` will exit with a non-zero status code. Encrypted values read through `stdin` will be later accessible as their interpreted type by golang’s default JSON parser. This means that the string `“true”` becomes the boolean `true`. If encrypting the contents of a file, you can pass its path to the `-i|--input-file` flag and `gcy` will read from it instead of `stdin`.
+
+`set` will read up to 4096 bytes before exiting with an error, to account for AWS's KMS service limitations in this regard.
 
 If a `defaults` or `default` file with the same extension as `CONFIG_FILE` exists in the same directory, `gcy` will add a nil value for `KEYPATH` in said file.
 
@@ -209,14 +198,14 @@ Outputs:
 
 ## `rekey`
 
-`gcy rekey CONFIG_FILE [keys]`
+`gcy rekey [flags] CONFIG_FILE`
 
-Re-encrypts all the secret values with specified `keys`. If no keys are specified, `gcy` will prompt the user to select them from a list.
+Re-encrypts all the secret values with specified arguments. By default, it will use the same provider for this operation, unless `--provider` is passed.
 
 ### Options:
 
 - `--provider value`, `-p value`: The provider to encrypt values with (value is one of: [kms](pkg/crypto/kms), [gpg](pkg/crypto/gpg), [password](pkg/crypto/password))
-- `--key value`: The kms key ARN to use
+- `--key value`: The AWS KMS key ARN to use. If no key is specified, `gcy` will prompt the user to select it from a list.
 - `--public-key value`: A gpg public key's identity: a fingerprint like or email to use as a recipient to encrypt this file's data key. This option can be entered multiple times. If no recipients are specified, a list of available keys will be printed for the user to choose from.
 - `--password value`: A password to use for encryption and decryption, also read from the environment variable `$CONFIG_PASSWORD`. To prevent your shell from remembering the password, start your command with a space: `[space]gcy ...`
 
@@ -235,6 +224,43 @@ gcy rekey config-up-there.yml
 # or specify the key if you know it
 gcy rekey config-up-there.yml arn:aws:kms:an-aws-region:an-account:alias/an-alias
 ```
+
+---
+
+## Config files
+
+Config files are [YAML](https://yaml.org/) files with nested objects representing a configuration tree. Storing encrypted values requires the presence of a `crypto` property with configuration for that provider, but the rest is up to you. `gcy` keeps keys ordered alphabetically doing a best-effort to keep comments in place. Here's a typical example of such a file, using the `kms` provider:
+
+```yaml
+crypto:
+  provider: kms
+  key: arn:aws:kms:an-aws-region:an-account:alias/an-alias
+
+# and any arbitrary yaml afterwards
+# Comments will be preserved by go-config-yourself, and all keys will be ordered
+someKey: someValue
+
+# Prefer nested objects over LONG_SCREAM_UNGROUPABLE_KEYNAMES
+someObject:
+  because: We use the right datatypes and
+  wereNotCrazy: true
+  verySecret:
+    encrypted: true
+    ciphertext: "...base64-encoded string"
+    hash: "aSHA256hashOfTheSecret"
+```
+
+The recommended location for config files for projects is in the `config/` directory of a repository. A common usage pattern is to start with a `config/defaults.yml` file and then add override files for each environment the application will run in, like so:
+
+```
+- your-awesome-project/
+  | - config/
+      | - defaults.yml
+      | - staging.yml
+      | - production.yml
+```
+
+In the above scenario, you may store defaults or placeholders in `defaults.yml` with no encryption, while storing only the necessary secrets to override these placeholders in separate files. `staging.yml` and `production.yml` will only contain overrides to be applied on top of `defaults.yml`. `gcy` automatically adds placeholder values to `defaults.yml` after storing secrets in environment-specific files.
 
 ---
 

@@ -1,18 +1,27 @@
 # Developing `go-config-yourself`
 
-Run `make os-dependencies` to install project dependencies, you'll need [`brew`](https://brew.sh/) installed
+This project uses [Go Modules](https://github.com/golang/go/wiki/Modules), `go` version 1.11 or greater is required. This project's folder layout is inspired by the [golang-standards/project-layout](https://github.com/golang-standards/project-layout) repository.
 
+## MacOS
+
+Developing on MacOS requires [homebrew](https://brew.sh/) to be installed on the system. Setting up your system for it is as easy as:
 
 ```sh
 make setup-dev
 ```
 
-You may also install the latest snapshot, generated after every merge to the mainline branch. Make sure you uninstall any current versions:
+## Other OS
 
-```sh
-brew update && brew uninstall --ignore-dependencies go-config-yourself
-brew install --HEAD blinkhealth/opensource-formulas/go-config-yourself
-```
+On other systems, you should install the following components:
+
+- [bats](https://github.com/bats-core/bats-core)
+- [gpg](https://gnupg.org/)
+- [gpgme](https://gnupg.org/software/gpgme/index.html)
+
+The following packages are required for cross-compiling compressed binaries:
+
+- [upx](https://upx.github.io/)
+- [docker](https://www.docker.com/)
 
 # Testing
 

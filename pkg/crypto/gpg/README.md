@@ -23,8 +23,8 @@ zero:
   hash: 6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b
 ```
 
-# Environment variables
+## Environment variables
 
 When using the `gpg` provider, these environment variables can affect the way `go-config-yourself` interacts with the GPG agent.
 
-- `GNUPGHOME`: This path will be used as the [GPG homedir](https://www.gnupg.org/gph/en/manual/r1616.html). Usually, a folder with at least `pubring.gpg`, `secring.gpg` and `trustdb.gpg`.
+- `GNUPGHOME`: This path will be used as the [GPG homedir](https://www.gnupg.org/gph/en/manual/r1616.html).

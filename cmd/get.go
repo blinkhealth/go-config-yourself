@@ -56,7 +56,7 @@ func get(ctx *cli.Context) error {
 		log.Debug("Encoding as json")
 		jsonBytes, jsonErr := json.Marshal(v.Interface())
 		if jsonErr != nil {
-			err := fmt.Sprintf("Could not decode as json: %s", jsonErr)
+			err := fmt.Sprintf("Could not encode as json: %s", jsonErr)
 			return Exit(err, ExitCodeToolError)
 		}
 		fmt.Println(string(jsonBytes))

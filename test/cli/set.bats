@@ -70,6 +70,16 @@ function testDefaultFile() {
   [[ "$(bc get $file longBlob)" == "$secret" ]]
 }
 
+@test "set refuses to update crypto property" {
+  file=$(fixture encrypted.kms)
+
+  run $CMD set $file crypto <<<"must-fail"
+  [[ $status != 0 ]];
+
+  run $CMD set $file crypto.key <<<"must-fail"
+  [[ $status != 0 ]];
+}
+
 @test "set updates default file" {
   testDefaultFile default.yml
 }
@@ -77,3 +87,4 @@ function testDefaultFile() {
 @test "set updates defaults file" {
   testDefaultFile defaults.yml
 }
+

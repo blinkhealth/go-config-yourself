@@ -68,6 +68,11 @@ const noCryptoError = "Unable to store an encrypted value for '%s', use --plain-
 //Set saves an encrypted or plaintext value on the file
 func set(ctx *cli.Context) error {
 	keyPath := ctx.String("keypath")
+
+	if keyPath == "crypto" || strings.HasPrefix(keyPath, "crypto.") {
+		return Exit(fmt.Errorf("Unable to modify `crypto` property, use `rekey` instead."), ExitCodeInputError)
+	}
+
 	isPlainText := ctx.Bool("plain-text")
 	if !configFile.HasCrypto() && !isPlainText {
 		// Won't store a plaintext unless we very explicitly ask for it

@@ -21,6 +21,8 @@ func GetKeyArguments(ctx *cli.Context) (args map[string]interface{}) {
 				args[name] = ctx.StringSlice(name)
 			case *cli.StringFlag, *cli.GenericFlag:
 				args[name] = ctx.String(name)
+			case *cli.BoolFlag:
+				args[name] = ctx.Bool(name)
 			default:
 				panic(fmt.Sprintf("I don't know about type %T!\n", f))
 			}

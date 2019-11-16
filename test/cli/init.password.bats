@@ -1,7 +1,6 @@
 #!/usr/bin/env bats
 load "conftest"
 
-
 @test "password: init creates a valid config file with strong passwords" {
   file=$(fixture encrypted.password)
   rm "$file"
@@ -27,7 +26,7 @@ load "conftest"
   [[ $status != 0 ]];
   [[ $output == *"Password seems easy to guess"* ]]
 
-  run $CMD init --password "fabulousness" --provider password $file
+  run $CMD init --password "electrodoméstico" --provider password $file
   echo $output
   [[ $status != 0 ]];
   [[ $output == *"Password is too common"* ]]

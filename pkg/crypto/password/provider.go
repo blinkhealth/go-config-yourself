@@ -24,11 +24,11 @@ import (
 )
 
 // The minimum password length
-var PasswordValidationMinLength = 12
+var validationMinLength = 12
 
 // A folder to look for dicitionaries in
 // nolint:gosec
-var PasswordValidationDictionaryFolder = "/usr/share/dict"
+var validationDictionaryFolder = "/usr/share/dict"
 
 func init() {
 	pvd.RegisterProvider("password", New, []pvd.Argument{
@@ -102,10 +102,10 @@ func (provider *Provider) Replace(args map[string]interface{}) (err error) {
 
 	skipValidation := args["skip-password-validation"]
 	if skipValidation != true {
-		log.Debug("Validating password complexity")
+		log.Debugf("Validating password complexity: min-length %d, dictionary: %s", validationMinLength, validationDictionaryFolder)
 		validator := crunchy.NewValidatorWithOpts(crunchy.Options{
-			MinLength:      PasswordValidationMinLength,
-			DictionaryPath: PasswordValidationDictionaryFolder,
+			MinLength:      validationMinLength,
+			DictionaryPath: validationDictionaryFolder,
 		})
 
 		if err := validator.Check(password); err != nil {

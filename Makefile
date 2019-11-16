@@ -35,7 +35,11 @@ integration-test: test/gcy
 		bats --recursive test/cli && rm test/gcy
 
 test/gcy:
-	CGO=1 go build -tags test -ldflags "-X main.version=test" -o test/gcy
+	mkdir -p /tmp/gcy-test-dict
+	echo "electrodoméstico" > /tmp/gcy-test-dict/words
+	CGO=1 go build -tags test \
+		-ldflags "-X main.version=test -X github.com/blinkhealth/go-config-yourself/pkg/crypto/password.validationDictionaryFolder=/tmp/gcy-test-dict" \
+		-o test/gcy
 
 coverage:
 	mkdir -p $(REPORTS)/coverage

@@ -33,13 +33,13 @@ func init() {
 			&cli.BoolFlag{
 				Name:    "plain-text",
 				Value:   false,
-				Usage:   "save the value as plain text instead of encrypting",
+				Usage:   "Store the value as plain text with no encryption",
 				Aliases: []string{"p"},
 			},
 			&cli.StringFlag{
 				Name:    "input-file",
 				Value:   "",
-				Usage:   "Read this file instead of prompting for input",
+				Usage:   "Use the specified file path instead of prompting for input from `stdin`",
 				Aliases: []string{"i"},
 			},
 		},

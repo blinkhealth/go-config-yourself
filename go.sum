@@ -41,8 +41,6 @@ github.com/mattn/go-isatty v0.0.4 h1:bnP0vzxcAdeI1zdubAl5PjU6zsERjGZb7raWodagDYs
 github.com/mattn/go-isatty v0.0.4/go.mod h1:M+lRXTBqGeGNdLjl/ufCoiOlB5xdOkqRJdNxMWT7Zi4=
 github.com/muesli/crunchy v0.0.0-20191002192727-c0afa2da818f h1:unPFR8YkElhCWaIxhnbnzzquzRJfQf4iOhi55BhZ7Ck=
 github.com/muesli/crunchy v0.0.0-20191002192727-c0afa2da818f/go.mod h1:5lzc6MdV+5Slv+/QXAMxg9zSQXCZELYNs9UJBKcNyYA=
-github.com/nbutton23/zxcvbn-go v0.0.0-20180912185939-ae427f1e4c1d h1:AREM5mwr4u1ORQBMvzfzBgpsctsbQikCVpvC+tX285E=
-github.com/nbutton23/zxcvbn-go v0.0.0-20180912185939-ae427f1e4c1d/go.mod h1:o96djdrsSGy3AWPyBgZMAGfxZNfgntdJG+11KU4QvbU=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/proglottis/gpgme v0.0.0-20190226023825-8e0937a489db h1:rZhGqKvKPpjnTMVhIXeRMeSP82/gAD1N50lkAGXZJBc=

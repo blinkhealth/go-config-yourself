@@ -5,6 +5,9 @@ export WORKDIR="/tmp/go-config-yourself-test"
 # For the source of these values, look at provider/kms/service_kms_mock.go
 export GOOD_KEY="arn:aws:kms:us-east-1:000000000000:key/00000000-0000-0000-0000-000000000000"
 export BAD_KEY="arn:aws:kms:us-east-1:111111111111:key/00000000-0000-0000-0000-111111111111"
+# https://xkcd.com/936/
+export GOOD_PASSWORD="correct horse battery staple"
+
 mkdir -p "$WORKDIR"
 
 function setup() {

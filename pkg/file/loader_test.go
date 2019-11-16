@@ -50,7 +50,7 @@ func TestConfigLoading(t *testing.T) {
 func TestCreateConfig(t *testing.T) {
 	selection := "0\n"
 	impossibleSelection := "128"
-	passwordSelection := "password"
+	passwordSelection := "correct horse battery staple"
 	emptyStdin := ""
 	nonInteger := "asdf"
 	envPassword := map[string]string{
@@ -86,7 +86,7 @@ func TestCreateConfig(t *testing.T) {
 		// password env var
 		{"password", nil, &envPassword, nil, false},
 		// password arg
-		{"password", map[string]interface{}{"password": "secret"}, nil, nil, false},
+		{"password", map[string]interface{}{"password": passwordSelection}, nil, nil, false},
 		// password through stdin selection
 		{"password", nil, nil, &passwordSelection, false},
 		// password with empty stdin

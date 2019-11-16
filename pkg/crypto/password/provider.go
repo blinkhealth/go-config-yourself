@@ -12,14 +12,23 @@
 package password
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
+	"github.com/muesli/crunchy"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/blinkhealth/go-config-yourself/internal/input"
 	pvd "github.com/blinkhealth/go-config-yourself/pkg/provider"
 )
+
+// The minimum password length
+var PasswordValidationMinLength = 12
+
+// A folder to look for dicitionaries in
+// nolint:gosec
+var PasswordValidationDictionaryFolder = "/usr/share/dict"
 
 func init() {
 	pvd.RegisterProvider("password", New, []pvd.Argument{
@@ -27,6 +36,11 @@ func init() {
 			Name:        "password",
 			Description: "A password to use for encryption and decryption",
 			EnvVarName:  "CONFIG_PASSWORD",
+		},
+		{
+			Name:        "skip-password-validation",
+			IsSwitch:    true,
+			Description: "Skips password validation, potentially making encrypted secrets easier to crack",
 		},
 	})
 }
@@ -84,6 +98,28 @@ func (provider *Provider) Replace(args map[string]interface{}) (err error) {
 		if err != nil {
 			return
 		}
+	}
+
+	skipValidation := args["skip-password-validation"]
+	if skipValidation != true {
+		log.Debug("Validating password complexity")
+		validator := crunchy.NewValidatorWithOpts(crunchy.Options{
+			MinLength:      PasswordValidationMinLength,
+			DictionaryPath: PasswordValidationDictionaryFolder,
+		})
+
+		if err := validator.Check(password); err != nil {
+			switch err {
+			case crunchy.ErrEmpty, crunchy.ErrTooShort:
+				return errors.New("Chosen password is too short, please use at least 12 characters")
+			case crunchy.ErrDictionary, crunchy.ErrTooSystematic, crunchy.ErrTooFewChars, crunchy.ErrMangledDictionary:
+				return errors.New("Password seems easy to guess or has very low entropy")
+			default:
+				return err
+			}
+		}
+	} else {
+		log.Warn("Password validation skipped!")
 	}
 
 	svc, err := newPasswordService(password)
@@ -150,6 +186,7 @@ func getPassword(promptText string) (password string, err error) {
 			}
 			return "", err
 		}
+
 		password = string(secretBytes)
 	}
 

@@ -70,23 +70,7 @@ make install
 
 # Usage
 
-The command line interface is a program named `gcy` with four main commands: [`init`](#init), [`set`](#set), [`get`](#get) and [`rekey`](#rekey). Before diving in, here's how to get some help:
-
-```sh
-# See the included reference manual
-gcy help
-# or help for any command
-gcy help init
-# also a flag, so you don't even need to hit backspace
-gcy init --provider kms --key some-long-arn --help
-# see this exact page
-man gcy
-# or pages about providers
-man gcy-password
-
-# Show verbose output
-gcy --verbose # ...rest of the command
-```
+The command line interface is a program named `gcy` with four main commands: [`init`](#init), [`set`](#set), [`get`](#get) and [`rekey`](#rekey).
 
 ## `init`
 
@@ -241,16 +225,7 @@ gcy rekey config-up-there.yml
 
 # or specify the key if you know it
 gcy rekey config-up-there.yml arn:aws:kms:an-aws-region:an-account:alias/an-alias
-
-# Rekey between AWS profiles by temporarily rekeying with a password
-export CONFIG_PASSWORD="VERY-INSECURE-TEMPORARY-PASSWORD"
-AWS_PROFILE=source gcy rekey --provider password config/file.yml
-AWS_PROFILE=destination gcy rekey --provider kms config/file.yml
 ```
-
-### Shell completion
-
-`gcy` provides shell completion scripts for `bash` and `zsh`, and these should be installed by default with package managers.
 
 ---
 
@@ -259,11 +234,8 @@ AWS_PROFILE=destination gcy rekey --provider kms config/file.yml
 Config files are [YAML](https://yaml.org/) files with nested objects representing a configuration tree. Storing encrypted values requires the presence of a `crypto` property with configuration for that provider, but the rest is up to you. `gcy` keeps keys ordered alphabetically, doing its best-effort to keep comments in place. Here's a typical example of such a file, using the `kms` provider:
 
 ```yaml
-# `crypto` is a reserved top-level property, which stores metadata about this file
 crypto:
-  # provider specifies the encryption/decryption mechanism (either kms, gpg, or password)
   provider: kms
-  # in the `kms` case, encrypt all secrets in this file with this key ARN
   key: arn:aws:kms:an-aws-region:an-account:alias/an-alias
 
 # and any arbitrary yaml afterwards
@@ -275,7 +247,6 @@ someObject:
   because: We use the right datatypes and
   wereNotCrazy: true
   verySecret:
-    # `encrypted` is a reserved property name
     encrypted: true
     ciphertext: "...base64-encoded string"
     hash: "aSHA256hashOfTheSecret"

@@ -7,6 +7,7 @@ require (
 	github.com/aws/aws-sdk-go v1.25.36
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e
 	github.com/manifoldco/promptui v0.3.2
+	github.com/mitchellh/go-wordwrap v1.0.0
 	github.com/muesli/crunchy v0.0.0-20191002192727-c0afa2da818f
 	github.com/proglottis/gpgme v0.1.0
 	github.com/sirupsen/logrus v1.4.2

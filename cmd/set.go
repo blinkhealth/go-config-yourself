@@ -16,13 +16,20 @@ import (
 )
 
 func init() {
+
+	const description = "Stores a value at `KEYPATH`, encrypting it by default, and saves it to `CONFIG_FILE`\n\n" +
+		"`KEYPATH` is a dot-delimited path to values, see `gcy help keypath` for examples.\n\n" +
+		"`gcy set` prompts for input, unless a value is provided via `stdin` or the `--input-file` flag. Values will be interpreted with golang’s default JSON parser before storage, so for example the string `“true”` will be stored as the boolean `true`. Due to existing AWS KMS service limitations, `gcy set` will read up to 4096 bytes before exiting with an error and closing its input.\n\n" +
+		"A properly configured `crypto` property must exist `CONFIG_FILE` for encryption to succeed, `gcy set` will exit with a non-zero status code otherwise. See `gcy help config-file` for more information about `CONFIG_FILE`.\n\n" +
+		"If a `defaults` or `default` file with the same extension as `CONFIG_FILE` exists in the same directory, `gcy set` will add a nil value for `KEYPATH` in said file."
+
 	App.Commands = append(App.Commands, &cli.Command{
 		Name:        "set",
 		Before:      beforeCommand,
 		Aliases:     []string{"edit"},
-		Usage:       "Set a config value in CONFIG_FILE",
+		Usage:       "Set a value in CONFIG_FILE at KEYPATH",
 		ArgsUsage:   "CONFIG_FILE KEYPATH",
-		Description: "Prompts for a value from stdin, encrypts it and saves it at KEYPATH of CONFIG_FILE",
+		Description: description,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:   "keypath",

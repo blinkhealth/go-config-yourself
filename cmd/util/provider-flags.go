@@ -33,10 +33,11 @@ func (e providerFlag) String() string {
 // KeyFlags returns a list of cli flags for key-related operations
 func KeyFlags() (flags []cli.Flag) {
 	flags = append(flags, &cli.GenericFlag{
-		Name:    "provider",
-		Aliases: []string{"p"},
-		Usage:   fmt.Sprintf("The provider to encrypt values with (one of: %s)", strings.Join(pvd.ProviderList, ", ")),
-		Value:   &providerFlag{Available: pvd.ProviderList},
+		Name:        "provider",
+		Aliases:     []string{"p"},
+		Usage:       fmt.Sprintf("The provider to encrypt values with (one of: %s)", strings.Join(pvd.ProviderList, ", ")),
+		Value:       &providerFlag{Available: pvd.ProviderList},
+		DefaultText: "aws",
 	})
 
 	for _, flag := range pvd.AvailableFlags() {

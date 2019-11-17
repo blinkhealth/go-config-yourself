@@ -12,17 +12,16 @@ import (
 )
 
 func init() {
+	const description = "Re-encrypts all the secret values with specified arguments in `CONFIG_FILE`.\n\n" +
+		"By default, it will reuse the same provider for this operation, unless `--provider` is passed. If needed, `gcy rekey` will query your provider for a list of keys to choose from when using the `aws` or `gpg` providers, and a password will be prompted for when using the `password` provider."
+
 	App.Commands = append(App.Commands, &cli.Command{
-		Name:  "rekey",
-		Usage: "Re-encrypts all the secret values with a new crypto config",
-		Description: `Re-keying a file will update its crypto config to new values. A file
-   can be re-keyed with the same provider and new keys, or to a completely
-   different provider. After the config is changed, go-config-yourself will re-encrypt
-   all encrypted values with the new configuration. If no keys are specified,
-   go-config-yourself will prompt the user to select them from a list.`,
-		ArgsUsage: "CONFIG_FILE [key...]",
-		Action:    rekey,
-		Flags:     KeyFlags,
+		Name:        "rekey",
+		Usage:       "Re-encrypts all the secret values with a new crypto config",
+		Description: description,
+		ArgsUsage:   "CONFIG_FILE",
+		Action:      rekey,
+		Flags:       KeyFlags,
 		ShellComplete: func(ctx *cli.Context) {
 			if ctx.NArg() == 0 {
 				if !autocomplete.ListProviderFlags(ctx) {

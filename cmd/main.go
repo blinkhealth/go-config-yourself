@@ -71,6 +71,10 @@ func Main(version string) {
 
 	cli.InitCompletionFlag.Hidden = true
 
+	cli.HelpPrinter = helpPrinter
+	cli.AppHelpTemplate = helpTemplateApp
+	cli.CommandHelpTemplate = helpTemplateCmd
+
 	if err := App.Run(os.Args); err != nil {
 		log.Debug("Exiting with error")
 		exitCode := 1

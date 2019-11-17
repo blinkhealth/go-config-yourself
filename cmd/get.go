@@ -13,14 +13,16 @@ import (
 )
 
 func init() {
+	const description = "Outputs the plain-text value for `KEYPATH` in `CONFIG_FILE`. If the queried value is a dictionary, it will be encoded as JSON, with all of the encrypted values within decrypted.\n\n" +
+		"`KEYPATH` refers to a dot-delimited path to values, see `gcy help keypath` for examples. If a given `KEYPATH` is not found in `CONFIG_FILE`, `gcy get` will fail with exit code 2."
+
 	App.Commands = append(App.Commands, &cli.Command{
-		Name:      "get",
-		Before:    beforeCommand,
-		Aliases:   []string{"show"},
-		Usage:     "Get a config value out of CONFIG_FILE",
-		ArgsUsage: "CONFIG_FILE KEYPATH",
-		Description: `Prints to stdout the decrypted value for KEYPATH. It will print out JSON if the value at KEYPATH is a dictionary or list.
-A KEYPATH is a sequence of keys delimited by the dot character. Integers in a keypath specify the index of an item in a list.`,
+		Name:        "get",
+		Before:      beforeCommand,
+		Aliases:     []string{"show"},
+		Usage:       "Output a value from a file",
+		ArgsUsage:   "CONFIG_FILE KEYPATH",
+		Description: description,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:   "keypath",

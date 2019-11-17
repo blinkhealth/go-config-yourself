@@ -236,7 +236,7 @@ Outputs:
 ## `rekey`
 
 ```sh
-gcy rekey [flags] CONFIG_FILE
+gcy rekey [options] CONFIG_FILE
 ```
 
 Re-encrypts all the secret values with specified arguments in `CONFIG_FILE`.

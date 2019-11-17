@@ -26,7 +26,7 @@ import (
 // The minimum password length
 var validationMinLength = 12
 
-// A folder to look for dicitionaries in
+// A folder to look for dictionaries in
 // nolint:gosec
 var validationDictionaryFolder = "/usr/share/dict"
 
@@ -100,26 +100,14 @@ func (provider *Provider) Replace(args map[string]interface{}) (err error) {
 		}
 	}
 
-	skipValidation := args["skip-password-validation"]
-	if skipValidation != true {
-		log.Debugf("Validating password complexity: min-length %d, dictionary: %s", validationMinLength, validationDictionaryFolder)
-		validator := crunchy.NewValidatorWithOpts(crunchy.Options{
-			MinLength:      validationMinLength,
-			DictionaryPath: validationDictionaryFolder,
-		})
-
-		if err := validator.Check(password); err != nil {
-			switch err {
-			case crunchy.ErrEmpty, crunchy.ErrTooShort:
-				return errors.New("Chosen password is too short, please use at least 12 characters")
-			case crunchy.ErrDictionary, crunchy.ErrTooSystematic, crunchy.ErrTooFewChars, crunchy.ErrMangledDictionary:
-				return errors.New("Password seems easy to guess or has very low entropy")
-			default:
-				return err
-			}
-		}
+	if args["skip-password-validation"] == true {
+		log.Warn("Password complexity validation skipped!")
 	} else {
-		log.Warn("Password validation skipped!")
+		log.Debugf("Validating password complexity: min-length %d, dictionary: %s", validationMinLength, validationDictionaryFolder)
+		err = validatePassword(password)
+		if err != nil {
+			return
+		}
 	}
 
 	svc, err := newPasswordService(password)
@@ -191,4 +179,24 @@ func getPassword(promptText string) (password string, err error) {
 	}
 
 	return password, nil
+}
+
+func validatePassword(password string) error {
+	validator := crunchy.NewValidatorWithOpts(crunchy.Options{
+		MinLength:      validationMinLength,
+		DictionaryPath: validationDictionaryFolder,
+	})
+
+	if err := validator.Check(password); err != nil {
+		switch err {
+		case crunchy.ErrEmpty, crunchy.ErrTooShort:
+			return errors.New("Chosen password is too short, please use at least 12 characters")
+		case crunchy.ErrDictionary, crunchy.ErrTooSystematic, crunchy.ErrTooFewChars, crunchy.ErrMangledDictionary:
+			return errors.New("Password seems easy to guess or has very low entropy")
+		default:
+			return err
+		}
+	}
+
+	return nil
 }

@@ -38,7 +38,7 @@ var helpPrinter = func(w io.Writer, templ string, data interface{}) {
 			for _, line := range strings.Split(data, "\n") {
 				wrapped = wrapped + "\n" + wordwrap.WrapString(line, uint(termCols-2))
 			}
-			return strings.ReplaceAll(wrapped, "\n", "\n  ")
+			return strings.Replace(wrapped, "\n", "\n  ", -1)
 		},
 	})
 	boldened := markdownCodeBlock.ReplaceAll(buf.Bytes(), boldReplacement)

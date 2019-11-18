@@ -5,7 +5,7 @@ The Password provider encrypts values with a key derived from a user-defined pas
 
 ## A note on password security
 
-Passwords are checked with [muesli/crunchy](github.com/muesli/crunchy) unless `--allow-insecure-passwords` is provided, which disables all checks. Regardless, you should **ensure a password with appropriate complexity is selected for your use case!**
+Passwords are checked with [muesli/crunchy](github.com/muesli/crunchy) unless `--skip-password-validation` is provided, which disables all checks. **Warning:** Only use this flag if you're certain your passwords will be of sufficient complexity. Simple passwords are easy to guess and/or brute force, and negate the benefits of encryption. Always ensure passwords with appropriate complexity are selected for your use case.
 
 ## Example
 

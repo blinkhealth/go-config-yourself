@@ -26,6 +26,11 @@ func FromValue(data map[string]interface{}) (fy *Tree, err error) {
 
 // FromBytes returns Tree a byte slice
 func FromBytes(data []byte) (fy *Tree, err error) {
+	defer func() {
+		if panicErr := recover(); panicErr != nil {
+			err = fmt.Errorf("Unable to parse as yaml: %s", panicErr)
+		}
+	}()
 	err = yml.Unmarshal(data, &fy)
 	return
 }

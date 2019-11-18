@@ -40,7 +40,8 @@ func KeyFlags() (flags []cli.Flag) {
 	})
 
 	for _, flag := range pvd.AvailableFlags() {
-		if flag.Repeatable {
+		switch {
+		case flag.Repeatable:
 			f := &cli.StringSliceFlag{
 				Name:  flag.Name,
 				Usage: flag.Description,
@@ -50,7 +51,13 @@ func KeyFlags() (flags []cli.Flag) {
 			}
 
 			flags = append(flags, f)
-		} else {
+		case flag.IsSwitch:
+			f := &cli.BoolFlag{
+				Name:  flag.Name,
+				Usage: flag.Description,
+			}
+			flags = append(flags, f)
+		default:
 			f := &cli.StringFlag{
 				Name:  flag.Name,
 				Usage: flag.Description,

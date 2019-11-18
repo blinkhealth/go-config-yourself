@@ -18,6 +18,7 @@ type Argument struct {
 	Default     string
 	EnvVarName  string
 	Repeatable  bool
+	IsSwitch    bool
 }
 
 // Crypto is what a provider implements to operate on secrets

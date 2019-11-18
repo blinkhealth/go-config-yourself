@@ -4,7 +4,7 @@ load "conftest"
 @test "rekey works between providers" {
   file=$(fixture encrypted.kms)
   old_ciphertext=$(grep ciphertext $file)
-  export CONFIG_PASSWORD="asdf"
+  export CONFIG_PASSWORD="$GOOD_PASSWORD"
   bc rekey --provider password $file
 
   # cyphertext changed

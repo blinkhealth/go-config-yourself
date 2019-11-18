@@ -73,12 +73,7 @@ The command line interface is a program named `gcy` with four main commands: [`i
 ## `init`
 
 ```sh
-go-config-yourself init
-  [--provider PROVIDER]
-  [--key KMS_KEY]
-  [--password PLAINTEXT_PASSWORD]
-  [--public-key GPG_IDENTITY]...
-  CONFIG_FILE
+go-config-yourself init [flags] CONFIG_FILE
 ```
 
 Creates a YAML config file at `$(pwd)/${CONFIG_FILE}`. You may omit the key flag to have `gcy` query your provider for a list of keys to choose from. You can specify which encryption provider to use by specifying the `--provider` flag. By default, `gcy` will use the [AWS KMS](https://aws.amazon.com/kms/) service.
@@ -89,6 +84,7 @@ Creates a YAML config file at `$(pwd)/${CONFIG_FILE}`. You may omit the key flag
 - `--key value`: The kms key ARN to use
 - `--public-key value`: A gpg public key's identity: a fingerprint or email to use as a recipient to encrypt this file's data key. This option can be entered multiple times. If no recipients are specified, a list of available keys will be printed for the user to choose from.
 - `--password value`: A password to use for encryption and decryption, also read from the environment variable `$CONFIG_PASSWORD`. To prevent your shell from remembering the password, start your command with a space: `[space]gcy ...`
+- `--skip-password-validation`: Skips password validation, potentially making encrypted secrets easier to crack
 
 ```sh
 # For kms
@@ -118,7 +114,12 @@ crypto:
 
 ## `set`
 
-`gcy set [-p,--plain-text] [-i,--input-file PATH] CONFIG_FILE KEYPATH`
+`gcy set [flags] CONFIG_FILE KEYPATH`
+
+### Options
+
+- `-p|--plain-text`: Store the provided secret as plain text with no encryption.
+- `-i|--input-file PATH`: Use the specified file path instead of prompting for input from `stdin`
 
 Sets a value at `KEYPATH`, prompting you for the input or reading from `stdin`. If the `crypto` property does not exist in `CONFIG_FILE` and `-p|--plain-text` is not specified, `gcy` will exit with a non-zero status code. Encrypted values read through `stdin` will be later accessible as their interpreted type by golang’s default JSON parser. This means that the string `“true”` becomes the boolean `true`. If encrypting the contents of a file, you can pass its path to the `-i|--input-file` flag and `gcy` will read from it instead of `stdin`.
 
@@ -208,6 +209,7 @@ Re-encrypts all the secret values with specified arguments. By default, it will 
 - `--key value`: The AWS KMS key ARN to use. If no key is specified, `gcy` will prompt the user to select it from a list.
 - `--public-key value`: A gpg public key's identity: a fingerprint or email to use as a recipient to encrypt this file's data key. This option can be entered multiple times. If no recipients are specified, a list of available keys will be printed for the user to choose from.
 - `--password value`: A password to use for encryption and decryption, also read from the environment variable `$CONFIG_PASSWORD`. To prevent your shell from remembering the password, start your command with a space: `[space]gcy ...`
+- `--skip-password-validation`: Skips password validation, potentially making encrypted secrets easier to crack
 
 ```sh
 gcy rekey config-up-there.yml

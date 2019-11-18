@@ -2,6 +2,11 @@
 
 The Password provider encrypts values with a key derived from a user-defined password using [golang.org/x/crypto/scrypt](https://godoc.org/golang.org/x/crypto/scrypt). The values are encrypted using AES in GCM mode.
 
+
+## A note on password security
+
+Passwords are checked with [muesli/crunchy](github.com/muesli/crunchy) unless `--skip-password-validation` is provided, which disables all checks. **Warning:** Only use this flag if you're certain your passwords will be of sufficient complexity. Simple passwords are easy to guess and/or brute force, and negate the benefits of encryption. Always ensure passwords with appropriate complexity are selected for your use case.
+
 ## Example
 
 ```yaml
@@ -24,7 +29,7 @@ For all operations, you may set the `CONFIG_PASSWORD` environment variable and t
 ```sh
 # a space prefixes this `export` to prevent the shell from storing
 # this password in its history file
- export CONFIG_PASSWORD="password"
+export CONFIG_PASSWORD="a very long password that's hard to guess!"
 go-config-yourself init --provider password file.yml
 # INFO[0000] Creating config at file.yml
 go-config-yourself set file.yml secret <<<"some secret"

@@ -1,5 +1,7 @@
 # go-config-yourself/pkg/file
 
+A library to read `go-config-yourself` config files from your golang application.
+
 ## Usage
 
 ```go

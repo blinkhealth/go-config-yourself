@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	saltSize = 12
 	// From https://godoc.org/golang.org/x/crypto/scrypt
 	// > N is a CPU/memory cost parameter, which must be a power of two greater than 1
 	scryptCost = 32 * 1024

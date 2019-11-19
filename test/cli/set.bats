@@ -54,11 +54,12 @@ function testDefaultFile() {
 
 @test "set creates a hash for encrypted values" {
   file=$(fixture encrypted.kms)
-  secret="this is very secret"
-  expectedHash=$(echo -n "$secret" | openssl dgst -sha256 | awk '{print $2}')
+  secret="$(date)"
 
   bc set $file hashProp <<<"$secret"
-  grep -E "hash:\s*$expectedHash" $file > /dev/null
+
+  hashLength=$(grep hashProp -A 3 "$file" | tail -n 1 | awk '{print length($2)}')
+  [[ $hashLength == 64 ]]
 }
 
 @test "set reads up to 4k out of stdin" {

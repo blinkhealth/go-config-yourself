@@ -72,7 +72,7 @@ jobs:
           name: Create a release
           command: |
             # build local, decrypt debian sign gpg key and import it
-            GOPATH="${HOME}/go" make build-local
+            GOPATH="${HOME}/go" go get && make build-local
             ./dist/local/gcy get bin/deploy/config.yml gpg.key > key.asc
             gpg --import key.asc
 

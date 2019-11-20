@@ -97,9 +97,9 @@ gcy init [options] CONFIG_FILE
 
 Creates a YAML config file at `CONFIG_FILE`
 
-`gcy init` will select the `aws` provider by default, and you can override it with the `--provider` flag
+`gcy init` will select the `aws` provider by default, and you can override it with the `--provider` flag.
 
-If needed, `gcy init` will query your provider for a list of keys to choose from when using the `aws` or `gpg` providers, and a password will be prompted for when using the `password` provider
+If needed, `gcy init` will query your provider for a list of keys to choose from when using the `aws` or `gpg` providers, and a password will be prompted for when using the `password` provider.
 
 See `gcy help config-file` for more information about `CONFIG_FILE`.
 
@@ -210,7 +210,7 @@ someSecret:
 gcy get CONFIG_FILE KEYPATH
 ```
 
-Outputs the plain-text value for `KEYPATH` in `CONFIG_FILE`. If the queried value is a dictionary, it will be encoded as JSON, with all of the encrypted values within decrypted
+Outputs the plain-text value for `KEYPATH` in `CONFIG_FILE`. If the queried value is a dictionary, it will be encoded as JSON, with all of the encrypted values within decrypted.
 
 `KEYPATH` refers to a dot-delimited path to values, see `gcy help keypath` for examples. If a given `KEYPATH` is not found in `CONFIG_FILE`, `gcy get` will fail with exit code 2.
 

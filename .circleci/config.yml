@@ -74,7 +74,7 @@ jobs:
             mv /go/pkg ~/go/
             export GOPATH="${HOME}/go"
             export PATH="$HOME/go/bin:$PATH"
-            make local
+            make build-local
             # debian packages can optionally get gpg signed
             ./dist/local/gcy get bin/deploy/config.yml gpg.key > key.asc
             gpg --pinentry-mode loopback \

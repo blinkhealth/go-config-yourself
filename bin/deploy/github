@@ -48,6 +48,7 @@ fi
 release_id=$(jq '.id' dist/github-release)
 
 for platform in macos linux; do
+  echo "Uploading $platform binary to release"
   set -o errexit
   curl --silent \
     --show-error \
@@ -58,6 +59,7 @@ for platform in macos linux; do
     --data-binary @"dist/gcy-$platform-amd64.tgz" \
     "${gh_base//api/uploads}/releases/${release_id}/assets?name=gcy-$platform-amd64.tgz&label=gcy-$platform-amd64" >/dev/null
 
+  echo "Uploading $platform shasum to release"
   curl --silent \
     --show-error \
     --fail \
@@ -69,6 +71,7 @@ for platform in macos linux; do
   set +o errexit
 done
 
+echo "Uploading debian package to release"
 set -o errexit
 curl --silent \
   --show-error \
@@ -76,5 +79,5 @@ curl --silent \
   -XPOST \
   -H 'Content-type: application/vnd.debian.binary-package' \
   -H "Authorization: Bearer $GITHUB_TOKEN" \
-  --data-binary @"dist/gcy-amd64.deb" \
-  "${gh_base//api/uploads}/releases/${release_id}/assets?name=gcy-$platform-amd64.deb&label=gcy-$platform-amd64-deb" >/dev/null
+  --data-binary @"dist/gcy-linux-amd64.deb" \
+  "${gh_base//api/uploads}/releases/${release_id}/assets?name=gcy-linux-amd64.deb&label=gcy-linux-amd64-deb" >/dev/null

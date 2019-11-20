@@ -1,13 +1,29 @@
 package file
 
 import (
-	"crypto/sha256"
+	"bytes"
+	"crypto/sha512"
 	"encoding/base64"
+	"encoding/gob"
 	"fmt"
 
 	"github.com/blinkhealth/go-config-yourself/internal/yaml"
 	pvd "github.com/blinkhealth/go-config-yourself/pkg/provider"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/crypto/scrypt"
+)
+
+const (
+	// From https://godoc.org/golang.org/x/crypto/scrypt
+	// > N is a CPU/memory cost parameter, which must be a power of two greater than 1
+	scryptCost = 32 * 1024
+	// > r and p must satisfy r * p < 2^30
+	scryptR = 8
+	scryptP = 1
+	// quote continues:
+	// > The recommended parameters for interactive logins as of 2017 are N=32768, r=8 and p=1.
+	// > The parameters N, r, and p should be increased as memory latency and CPU parallelism increases;
+	// > consider setting N to the highest power of 2 you can derive within 100 milliseconds.
 )
 
 type cryptoDisabledError struct{}
@@ -62,16 +78,34 @@ func encryptCipherText(plainText []byte, provider pvd.Crypto) (map[string]interf
 		return nil, err
 	}
 
-	hash := sha256.New()
-	_, _ = hash.Write(plainText)
-
 	cipherText := base64.StdEncoding.EncodeToString(encryptedBytes)
+	hash, hashingErr := plainTextHash(plainText, provider)
+	if hashingErr != nil {
+		return nil, hashingErr
+	}
 
 	return map[string]interface{}{
 		"ciphertext": cipherText,
 		"encrypted":  true,
-		"hash":       fmt.Sprintf("%x", hash.Sum(nil)),
+		"hash":       fmt.Sprintf("%x", hash),
 	}, nil
+}
+
+func plainTextHash(plainText []byte, provider pvd.Crypto) (hash []byte, err error) {
+	salt := new(bytes.Buffer)
+	enc := gob.NewEncoder(salt)
+	err = enc.Encode(provider.Serialize())
+	if err != nil {
+		return nil, err
+	}
+
+	hasher := sha512.New512_256()
+	_, _ = hasher.Write(plainText)
+	hash, err = scrypt.Key(hasher.Sum(nil), salt.Bytes(), scryptCost, scryptR, scryptP, 32)
+	if err != nil {
+		return nil, err
+	}
+	return
 }
 
 func secretsForNode(node *yaml.Tree, parent string) []string {

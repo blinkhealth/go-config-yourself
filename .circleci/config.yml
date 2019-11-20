@@ -79,10 +79,10 @@ jobs:
             ./dist/local/gcy get bin/deploy/config.yml gpg.key > key.asc
             gpg --import key.asc
 
+            # release
             mv /go/pkg ~/go/
             export GOPATH="${HOME}/go"
             export PATH="$HOME/go/bin:$PATH"
-            # debian packages can optionally get gpg signed
             make release
       - run:
           name: Update git pages

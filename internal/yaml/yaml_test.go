@@ -63,7 +63,7 @@ func TestFileLoadErrors(t *testing.T) {
 		err  string
 	}{
 		{fx.Path("non-existent-file"), "Could not read file"},
-		{fx.Path("bad/syntax"), "could not find expected ':'"},
+		{fx.Path("bad/syntax"), "Unable to parse as yaml"},
 	}
 
 	for _, tst := range tests {
@@ -130,10 +130,10 @@ func TestGetValidValues(t *testing.T) {
 		{"list.0", "a"},
 		{"list.4", nil},
 		{"nestedList", []interface{}{
-			map[interface{}]interface{}{"prop": true},
-			map[interface{}]interface{}{"prop": false},
+			map[string]interface{}{"prop": true},
+			map[string]interface{}{"prop": false},
 		}},
-		{"nestedList.1", map[interface{}]interface{}{"prop": false}},
+		{"nestedList.1", map[string]interface{}{"prop": false}},
 		{"nestedList.1.prop", false},
 		{"number", 1},
 		{"object", map[string]interface{}{"key": "value"}},
@@ -175,10 +175,10 @@ func TestSetValidValues(t *testing.T) {
 		// new list elements don't magically grow arrays
 		{"new.list.5", "a", "new.list.4"},
 		{"new.nestedList", []interface{}{
-			map[interface{}]interface{}{"prop": true},
-			map[interface{}]interface{}{"prop": false},
+			map[string]interface{}{"prop": true},
+			map[string]interface{}{"prop": false},
 		}, ""},
-		{"new.nestedList.2", map[interface{}]interface{}{"prop": false}, ""},
+		{"new.nestedList.2", map[string]interface{}{"prop": false}, ""},
 		{"new.nestedList.2.prop", false, ""},
 		{"new.number", 1, ""},
 		{"new.object", map[string]interface{}{"key": "value"}, ""},

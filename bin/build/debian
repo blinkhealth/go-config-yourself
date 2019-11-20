@@ -91,5 +91,5 @@ echo "usr/bin/gcy" >"$deb/source/include-binaries"
 echo "gcy binary: statically-linked-binary" >"${deb}/source/lintian-overrides"
 
 # build binary package
-( cd "${PACKAGE_LOCATION}" && debuild -b -sa )
+( cd "${PACKAGE_LOCATION}" && sudo debuild -b -sa )
 mv "${PACKAGE_LOCATION}_amd64.deb" dist/gcy-linux-amd64.deb

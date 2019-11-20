@@ -60,7 +60,7 @@ jobs:
           name: install dependencies
           command: |
             sudo apt-get update
-            sudo apt-get install -y golang-go awscli curl gdebi
+            sudo apt-get install -y golang-go awscli curl gdebi debhelper devscripts
             sudo mkdir -p /go
             sudo chown -R $USER:$USER /go
             curl -LO https://github.com/jgm/pandoc/releases/download/2.7.3/pandoc-2.7.3-1-amd64.deb
@@ -74,6 +74,12 @@ jobs:
             mv /go/pkg ~/go/
             export GOPATH="${HOME}/go"
             export PATH="$HOME/go/bin:$PATH"
+            make local
+            # debian packages can optionally get gpg signed
+            ./dist/local/gcy get bin/deploy/config.yml gpg.key > key.asc
+            gpg --pinentry-mode loopback \
+              --passphrase-file <(./dist/local/gcy get bin/deploy/config.yml gpg.password) \
+              --import key.asc
             make release
       - run:
           name: Update git pages

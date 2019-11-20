@@ -50,25 +50,27 @@ brew update && brew upgrade go-config-yourself
 ## Debian/Ubuntu
 
 ```sh
-add-apt-repository ppa:blinkhealth/stable
-apt update
-apt-get install go-config-yourself
+last_release="https://api.github.com/repos/blinkhealth/go-config-yourself/releases/latest"
+version=$(curl --silent "$last_release" | awk -F'"' '/tag_name/{print $4}' )
+curl -vO https://github.com/blinkhealth/go-config-yourself/releases/download/$version/gcy-linux-amd64.deb
+apt install ./gcy-linux-amd64.deb
 ```
 
 ## Other Linux distros:
 
 ```sh
-latest=$(curl --silent "https://api.github.com/repos/blinkhealth/blink-config/releases/latest" | awk -F'"' '/tag_name/{print $4}' )
-curl -vO https://github.com/blinkhealth/blink-config/releases/download/$latest/gcy-linux-amd64.tar.gz
+last_release="https://api.github.com/repos/blinkhealth/go-config-yourself/releases/latest"
+version=$(curl --silent "$last_release" | awk -F'"' '/tag_name/{print $4}' )
+curl -vO https://github.com/blinkhealth/go-config-yourself/releases/download/$version/gcy-linux-amd64.tar.gz
 tar xfz gcy-linux-amd64.tar.gz
-cp gcy /usr/local/bin
+make install
 ```
 
 ---
 
 # Usage
 
-The command line interface is a program named `gcy` with four main commands: [`init`](#init), [`set`](#set), [`get`](#get) and [`rekey`](#rekey)
+The command line interface is a program named `gcy` with four main commands: [`init`](#init), [`set`](#set), [`get`](#get) and [`rekey`](#rekey).
 
 ## `init`
 

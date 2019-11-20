@@ -68,3 +68,13 @@ for platform in macos linux; do
     "${gh_base//api/uploads}/releases/${release_id}/assets?name=gcy-$platform-amd64.shasum&label=shasum-gcy-$platform-amd64" >/dev/null
   set +o errexit
 done
+
+set -o errexit
+curl --silent \
+  --show-error \
+  --fail \
+  -XPOST \
+  -H 'Content-type: application/vnd.debian.binary-package' \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  --data-binary @"dist/gcy-amd64.deb" \
+  "${gh_base//api/uploads}/releases/${release_id}/assets?name=gcy-$platform-amd64.deb&label=gcy-$platform-amd64-deb" >/dev/null

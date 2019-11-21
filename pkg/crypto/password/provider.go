@@ -34,7 +34,7 @@ func init() {
 	pvd.RegisterProvider("password", New, []pvd.Argument{
 		{
 			Name:        "password",
-			Description: "A password to use for encryption and decryption",
+			Description: "A password to use for encryption and decryption. To prevent your shell from remembering the password in its history, start your command with a space: `[space]gcy ...`",
 			EnvVarName:  "CONFIG_PASSWORD",
 		},
 		{

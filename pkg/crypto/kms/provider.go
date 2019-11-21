@@ -25,7 +25,7 @@ func init() {
 	pvd.RegisterProvider("kms", New, []pvd.Argument{
 		{
 			Name:        "key",
-			Description: "The kms key ARN to use",
+			Description: "The AWS KMS key ARN to use",
 		},
 	})
 }

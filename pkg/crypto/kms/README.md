@@ -24,4 +24,4 @@ The following `AWS_*` environment variables are implemented:
 
 ## Known Issues
 
-- Since not all regions are [enabled by default](https://docs.aws.amazon.com/general/latest/gr/rande.html), and There is currently no API endpoint that lists the available regions for the user's AWS account, `gcy init` will only warn on `UnrecognizedClientException` and continue querying for keys in all regions.
+- Since not all regions are [enabled by default](https://docs.aws.amazon.com/general/latest/gr/rande.html), and there is currently no API endpoint to list the available regions for the user's AWS account, `gcy (init|rekey)` will only warn on `UnrecognizedClientException` and continue querying for keys in all regions.

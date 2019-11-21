@@ -13,11 +13,16 @@ import (
 )
 
 func init() {
+	const description = "Creates a YAML config file at `CONFIG_FILE`.\n\n" +
+		"`gcy init` will select the `aws` provider by default, and you can override it with the `--provider` flag.\n\n" +
+		"If needed, `gcy init` will query your provider for a list of keys to choose from when using the `aws` or `gpg` providers, and a password will be prompted for when using the `password` provider.\n\n" +
+		"See `gcy help config-file` for more information about `CONFIG_FILE`."
+
 	App.Commands = append(App.Commands, &cli.Command{
 		Name:        "init",
 		Usage:       "Create a config file",
-		ArgsUsage:   "CONFIG_FILE [KEYS]",
-		Description: "Prompts the user to select the keys for this config, unless specified creating the config file at CONFIG_FILE",
+		ArgsUsage:   "CONFIG_FILE",
+		Description: description,
 		Flags:       KeyFlags,
 		Action:      initAction,
 		ShellComplete: func(ctx *cli.Context) {

@@ -70,22 +70,45 @@ make install
 
 # Usage
 
-The command line interface is a program named `gcy` with four main commands: [`init`](#init), [`set`](#set), [`get`](#get) and [`rekey`](#rekey).
+The command line interface is a program named `gcy` with four main commands: [`init`](#init), [`set`](#set), [`get`](#get) and [`rekey`](#rekey). Before diving in, here's how to get some help:
+
+```sh
+# See the included reference manual
+gcy help
+# or help for any command
+gcy help init
+# also a flag, so you don't even need to hit backspace
+gcy init --provider kms --key some-long-arn --help
+# see this exact page
+man gcy
+# or pages about providers
+man gcy-password
+# Show verbose output
+gcy --verbose # ...rest of the command
+```
+
+
 
 ## `init`
 
 ```sh
-go-config-yourself init [flags] CONFIG_FILE
+gcy init [options] CONFIG_FILE
 ```
 
-Creates a YAML config file at `$(pwd)/${CONFIG_FILE}`. You may omit the key flag to have `gcy` query your provider for a list of keys to choose from. You can specify which encryption provider to use by specifying the `--provider` flag. By default, `gcy` will use the [AWS KMS](https://aws.amazon.com/kms/) service.
+Creates a YAML config file at `CONFIG_FILE`
+
+`gcy init` will select the `aws` provider by default, and you can override it with the `--provider` flag.
+
+If needed, `gcy init` will query your provider for a list of keys to choose from when using the `aws` or `gpg` providers, and a password will be prompted for when using the `password` provider.
+
+See `gcy help config-file` for more information about `CONFIG_FILE`.
 
 ### Options:
 
 - `--provider value`, `-p value`: The provider to encrypt values with (value is one of: [kms](pkg/crypto/kms), [gpg](pkg/crypto/gpg), [password](pkg/crypto/password))
-- `--key value`: The kms key ARN to use
+- `--key value`: The AWS KMS key ARN to use.
 - `--public-key value`: A gpg public key's identity: a fingerprint or email to use as a recipient to encrypt this file's data key. This option can be entered multiple times. If no recipients are specified, a list of available keys will be printed for the user to choose from.
-- `--password value`: A password to use for encryption and decryption, also read from the environment variable `$CONFIG_PASSWORD`. To prevent your shell from remembering the password, start your command with a space: `[space]gcy ...`
+- `--password value`: A password to use for encryption and decryption. To prevent your shell from remembering the password in its history, start your command with a space: `[space]gcy ...`. Can be set via the environment variable: `CONFIG_PASSWORD`.
 - `--skip-password-validation`: Skips password validation, potentially making encrypted secrets easier to crack
 
 ```sh
@@ -116,18 +139,25 @@ crypto:
 
 ## `set`
 
-`gcy set [flags] CONFIG_FILE KEYPATH`
+```sh
+gcy set [options] CONFIG_FILE KEYPATH
+```
+
+Stores a value at `KEYPATH`, encrypting it by default, and saves it to `CONFIG_FILE`
+
+`KEYPATH` is a dot-delimited path to values, see `gcy help keypath` for examples.
+
+`gcy set` prompts for input, unless a value is provided via `stdin` or the `--input-file` flag. Values will be interpreted with golang’s default JSON parser before storage, so for example the string `“true”` will be stored as the boolean `true`. Due to existing AWS KMS service limitations, `gcy set` will read up to 4096 bytes before exiting with an error and closing its input.
+
+A properly configured `crypto` property must exist `CONFIG_FILE` for encryption to succeed, `gcy set` will exit with a non-zero status code otherwise. See `gcy help config-file` for more information about `CONFIG_FILE`.
+
+If a `defaults` or `default` file with the same extension as `CONFIG_FILE` exists in the same directory, `gcy set` will add a nil value for `KEYPATH` in said file.
 
 ### Options
 
-- `-p|--plain-text`: Store the provided secret as plain text with no encryption.
+- `-p|--plain-text`: Store the value as plain text with no encryption
 - `-i|--input-file PATH`: Use the specified file path instead of prompting for input from `stdin`
 
-Sets a value at `KEYPATH`, prompting you for the input or reading from `stdin`. If the `crypto` property does not exist in `CONFIG_FILE` and `-p|--plain-text` is not specified, `gcy` will exit with a non-zero status code. Encrypted values read through `stdin` will be later accessible as their interpreted type by golang’s default JSON parser. This means that the string `“true”` becomes the boolean `true`. If encrypting the contents of a file, you can pass its path to the `-i|--input-file` flag and `gcy` will read from it instead of `stdin`.
-
-`set` will read up to 4096 bytes before exiting with an error, to account for AWS's KMS service limitations.
-
-If a `defaults` or `default` file with the same extension as `CONFIG_FILE` exists in the same directory, `gcy` will add a nil value for `KEYPATH` in said file.
 
 ```sh
 gcy set --plain-text config-up-there.yml someInt # user inputs "1"
@@ -176,9 +206,13 @@ someSecret:
 
 ## `get`
 
-`gcy get CONFIG_FILE KEYPATH`
+```sh
+gcy get CONFIG_FILE KEYPATH
+```
 
-Outputs the value for `KEYPATH` in `CONFIG_FILE`. `KEYPATH` is a dot delimited path to objects. If the output value is a dictionary it will be encoded as JSON, with all of the encrypted values within decrypted.
+Outputs the plain-text value for `KEYPATH` in `CONFIG_FILE`. If the queried value is a dictionary, it will be encoded as JSON, with all of the encrypted values within decrypted.
+
+`KEYPATH` refers to a dot-delimited path to values, see `gcy help keypath` for examples. If a given `KEYPATH` is not found in `CONFIG_FILE`, `gcy get` will fail with exit code 2.
 
 ```sh
 gcy get config-up-there.yml some.nested.object
@@ -201,16 +235,20 @@ Outputs:
 
 ## `rekey`
 
-`gcy rekey [flags] CONFIG_FILE`
+```sh
+gcy rekey [options] CONFIG_FILE
+```
 
-Re-encrypts all the secret values with specified arguments. By default, it will use the same provider for this operation, unless `--provider` is passed.
+Re-encrypts all the secret values with specified arguments in `CONFIG_FILE`.
+
+By default, it will reuse the same provider for this operation, unless `--provider` is passed. If needed, `gcy rekey` will query your provider for a list of keys to choose from when using the `aws` or `gpg` providers, and a password will be prompted for when using the `password` provider.
 
 ### Options:
 
 - `--provider value`, `-p value`: The provider to encrypt values with (value is one of: [kms](pkg/crypto/kms), [gpg](pkg/crypto/gpg), [password](pkg/crypto/password))
-- `--key value`: The AWS KMS key ARN to use. If no key is specified, `gcy` will prompt the user to select it from a list.
+- `--key value`: The AWS KMS key ARN to use.
 - `--public-key value`: A gpg public key's identity: a fingerprint or email to use as a recipient to encrypt this file's data key. This option can be entered multiple times. If no recipients are specified, a list of available keys will be printed for the user to choose from.
-- `--password value`: A password to use for encryption and decryption, also read from the environment variable `$CONFIG_PASSWORD`. To prevent your shell from remembering the password, start your command with a space: `[space]gcy ...`
+- `--password value`: A password to use for encryption and decryption. To prevent your shell from remembering the password in its history, start your command with a space: `[space]gcy ...`. Can be set via the environment variable: `CONFIG_PASSWORD`.
 - `--skip-password-validation`: Skips password validation, potentially making encrypted secrets easier to crack
 
 ```sh
@@ -227,7 +265,16 @@ gcy rekey config-up-there.yml
 
 # or specify the key if you know it
 gcy rekey config-up-there.yml arn:aws:kms:an-aws-region:an-account:alias/an-alias
+
+# Rekey between AWS profiles by temporarily rekeying with a password
+export CONFIG_PASSWORD="VERY-INSECURE-TEMPORARY-PASSWORD"
+AWS_PROFILE=source gcy rekey --provider password config/file.yml
+AWS_PROFILE=destination gcy rekey --provider kms config/file.yml
 ```
+
+### Shell completion
+
+`gcy` provides shell completion scripts for `bash` and `zsh`, and these should be installed by default with package managers.
 
 ---
 

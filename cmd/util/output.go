@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 
 	file "github.com/blinkhealth/go-config-yourself/pkg/file"
-	cli "gopkg.in/urfave/cli.v2"
+	cli "github.com/urfave/cli/v2"
 )
 
 // SerializeAndWrite a config file to disk

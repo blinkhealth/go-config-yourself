@@ -8,9 +8,14 @@ import (
 
 	comp "github.com/blinkhealth/go-config-yourself/cmd/autocomplete"
 	fx "github.com/blinkhealth/go-config-yourself/internal/fixtures"
-
+	diff "github.com/google/go-cmp/cmp"
 	log "github.com/sirupsen/logrus"
 )
+
+var allFlags = []string{
+	"--verbose",
+	"--version",
+}
 
 func TestMain(m *testing.M) {
 	log.SetLevel(log.DebugLevel)
@@ -18,17 +23,15 @@ func TestMain(m *testing.M) {
 }
 
 func TestCommandAutoComplete(t *testing.T) {
-	out := fx.MockStdoutAndArgs()
+	mockedStdOut := fx.MockStdoutAndArgs()
 	comp.CommandAutocomplete(fx.MockCliCtx(nil))
+	output := mockedStdOut()
+	options := strings.Split(output, "\n")
+	expected := []string{"command", ""}
 
-	if out := out(); out != strings.Join(append(allFlags, "command\n"), "\n") {
-		t.Fatalf("Invalid output: %s", out)
+	if !diff.Equal(options, expected) {
+		t.Fatalf("Invalid output, got: %v, expected %v", options, expected)
 	}
-}
-
-var allFlags = []string{
-	"--verbose",
-	"--version",
 }
 
 func TestListProviderFlags(t *testing.T) {

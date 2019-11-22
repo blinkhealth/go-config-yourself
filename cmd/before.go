@@ -4,7 +4,7 @@ import (
 	"github.com/blinkhealth/go-config-yourself/pkg/file"
 
 	log "github.com/sirupsen/logrus"
-	cli "gopkg.in/urfave/cli.v2"
+	cli "github.com/urfave/cli/v2"
 )
 
 // The configfile instance for this command session

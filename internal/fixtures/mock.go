@@ -9,7 +9,7 @@ import (
 
 	"github.com/proglottis/gpgme"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/urfave/cli.v2"
+	"github.com/urfave/cli/v2"
 )
 
 type mockKey string

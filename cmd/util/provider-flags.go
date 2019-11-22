@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	pvd "github.com/blinkhealth/go-config-yourself/pkg/provider"
-	cli "gopkg.in/urfave/cli.v2"
+	cli "github.com/urfave/cli/v2"
 )
 
 // providerFlag implements urfave/cli.v2/Generic

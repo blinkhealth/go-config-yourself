@@ -9,7 +9,7 @@ import (
 	"github.com/blinkhealth/go-config-yourself/pkg/file"
 
 	log "github.com/sirupsen/logrus"
-	cli "gopkg.in/urfave/cli.v2"
+	cli "github.com/urfave/cli/v2"
 )
 
 func init() {
@@ -25,7 +25,7 @@ func init() {
 		Description: description,
 		Flags:       KeyFlags,
 		Action:      initAction,
-		ShellComplete: func(ctx *cli.Context) {
+		BashComplete: func(ctx *cli.Context) {
 			autocomplete.ListProviderFlags(ctx)
 			os.Exit(1)
 		},

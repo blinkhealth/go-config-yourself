@@ -8,7 +8,7 @@ import (
 	"github.com/blinkhealth/go-config-yourself/pkg/file"
 
 	log "github.com/sirupsen/logrus"
-	cli "gopkg.in/urfave/cli.v2"
+	cli "github.com/urfave/cli/v2"
 )
 
 func init() {
@@ -22,7 +22,7 @@ func init() {
 		ArgsUsage:   "CONFIG_FILE",
 		Action:      rekey,
 		Flags:       KeyFlags,
-		ShellComplete: func(ctx *cli.Context) {
+		BashComplete: func(ctx *cli.Context) {
 			if ctx.NArg() == 0 {
 				if !autocomplete.ListProviderFlags(ctx) {
 					return

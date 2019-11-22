@@ -15,7 +15,7 @@ import (
 	"github.com/blinkhealth/go-config-yourself/cmd/autocomplete"
 	"github.com/blinkhealth/go-config-yourself/cmd/util"
 	log "github.com/sirupsen/logrus"
-	cli "gopkg.in/urfave/cli.v2"
+	cli "github.com/urfave/cli/v2"
 )
 
 var App = &cli.App{
@@ -41,9 +41,9 @@ var App = &cli.App{
 		}
 		return nil
 	},
-	Commands:              []*cli.Command{},
-	EnableShellCompletion: true,
-	ShellComplete:         autocomplete.CommandAutocomplete,
+	Commands:             []*cli.Command{},
+	EnableBashCompletion: true,
+	BashComplete:         autocomplete.CommandAutocomplete,
 	CommandNotFound: func(ctx *cli.Context, name string) {
 		// Show help, then error out
 		_ = cli.ShowAppHelp(ctx)
@@ -69,7 +69,7 @@ func Main(version string) {
 		Usage:   "print the version",
 	}
 
-	cli.InitCompletionFlag.Hidden = true
+	// cli.BashCompletionFlag = true
 
 	cli.HelpPrinter = helpPrinter
 	cli.AppHelpTemplate = helpTemplateApp

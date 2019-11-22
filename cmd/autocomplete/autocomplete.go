@@ -10,7 +10,7 @@ import (
 
 	pvd "github.com/blinkhealth/go-config-yourself/pkg/provider"
 	log "github.com/sirupsen/logrus"
-	cli "gopkg.in/urfave/cli.v2"
+	cli "github.com/urfave/cli/v2"
 )
 
 // CommandAutocomplete is the function that autocompletes the main command

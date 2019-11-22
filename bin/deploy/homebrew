@@ -51,7 +51,7 @@ gh brew contents/go-config-yourself.rb |
   jq -r '.content' |
   openssl base64 -d > .homebrew/source.rb
 
-sed -E "s|url .*|url '$(cat .homebrew/latest)'| s|sha256 .*|sha256 '$(cat .homebrew/latest-shasum)'|" .homebrew/source.rb > .homebrew/dest.rb
+sed -E "s|url .*|url '$(cat .homebrew/latest)'|; s|sha256 .*|sha256 '$(cat .homebrew/latest-shasum)'|" .homebrew/source.rb > .homebrew/dest.rb
 
 if diff --brief .homebrew/source.rb .homebrew/dest.rb >/dev/null; then
   cat .homebrew/dest.rb

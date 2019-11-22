@@ -17,8 +17,8 @@ import (
 
 	"github.com/mitchellh/go-wordwrap"
 	log "github.com/sirupsen/logrus"
+	cli "github.com/urfave/cli/v2"
 	"golang.org/x/crypto/ssh/terminal"
-	cli "gopkg.in/urfave/cli.v2"
 )
 
 var markdownCodeBlock = regexp.MustCompile("`([^`]+)`")

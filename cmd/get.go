@@ -9,7 +9,7 @@ import (
 	"github.com/blinkhealth/go-config-yourself/cmd/autocomplete"
 
 	log "github.com/sirupsen/logrus"
-	cli "gopkg.in/urfave/cli.v2"
+	cli "github.com/urfave/cli/v2"
 )
 
 func init() {
@@ -32,7 +32,7 @@ func init() {
 			},
 		},
 		Action: get,
-		ShellComplete: func(ctx *cli.Context) {
+		BashComplete: func(ctx *cli.Context) {
 			if ctx.NArg() == 0 {
 				os.Exit(1)
 			}

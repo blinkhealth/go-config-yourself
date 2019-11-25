@@ -12,8 +12,11 @@ import (
 )
 
 func init() {
-	const description = "Re-encrypts all the secret values with specified arguments in `CONFIG_FILE`.\n\n" +
-		"By default, it will reuse the same provider for this operation, unless `--provider` is passed. If needed, `gcy rekey` will query your provider for a list of keys to choose from when using the `aws` or `gpg` providers, and a password will be prompted for when using the `password` provider."
+	description := multiLineDescription(
+		"Re-encrypts all the secret values with specified arguments in `CONFIG_FILE`.",
+
+		"By default, it will reuse the same provider for this operation, unless `--provider` is passed. If needed, `gcy rekey` will query your provider for a list of keys to choose from when using the `aws` or `gpg` providers, and a password will be prompted for when using the `password` provider.",
+	)
 
 	App.Commands = append(App.Commands, &cli.Command{
 		Name:        "rekey",

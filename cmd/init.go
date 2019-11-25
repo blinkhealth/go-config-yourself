@@ -13,10 +13,13 @@ import (
 )
 
 func init() {
-	const description = "Creates a YAML config file at `CONFIG_FILE`.\n\n" +
-		"`gcy init` will select the `aws` provider by default, and you can override it with the `--provider` flag.\n\n" +
-		"If needed, `gcy init` will query your provider for a list of keys to choose from when using the `aws` or `gpg` providers, and a password will be prompted for when using the `password` provider.\n\n" +
-		"See `gcy help config-file` for more information about `CONFIG_FILE`."
+	description := multiLineDescription(
+		"Creates a YAML config file at `CONFIG_FILE`.",
+
+		"If needed, `gcy init` will query your provider for a list of keys to choose from when using the `aws` or `gpg` providers, and a password will be prompted for when using the `password` provider. `gcy init` will select the `aws` provider by default, and you can override it with the `--provider` flag.",
+
+		"See `gcy help config-file` for more information about `CONFIG_FILE`.",
+	)
 
 	App.Commands = append(App.Commands, &cli.Command{
 		Name:        "init",
@@ -26,8 +29,16 @@ func init() {
 		Flags:       KeyFlags,
 		Action:      initAction,
 		BashComplete: func(ctx *cli.Context) {
-			autocomplete.ListProviderFlags(ctx)
-			os.Exit(1)
+			if ctx.NArg() == 0 {
+				if !autocomplete.ListProviderFlags(ctx) {
+					return
+				}
+			}
+
+			if ctx.NArg() < 2 {
+				// offer file searching
+				os.Exit(2)
+			}
 		},
 	})
 }

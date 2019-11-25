@@ -27,7 +27,7 @@ func TestCommandAutoComplete(t *testing.T) {
 	comp.CommandAutocomplete(fx.MockCliCtx(nil))
 	output := mockedStdOut()
 	options := strings.Split(output, "\n")
-	expected := []string{"command", ""}
+	expected := []string{"--verbose", "--version", "command", ""}
 
 	if !diff.Equal(options, expected) {
 		t.Fatalf("Invalid output, got: %v, expected %v", options, expected)

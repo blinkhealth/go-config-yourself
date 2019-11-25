@@ -21,10 +21,15 @@ func CommandAutocomplete(ctx *cli.Context) {
 	}
 
 	for _, cmd := range ctx.App.VisibleCommands() {
-		if strings.HasPrefix(cmd.Name, firstArg) {
-			fmt.Println(cmd.Name)
+		if firstArg == "" || strings.HasPrefix(cmd.Name, firstArg) {
+			if os.Getenv("_CLI_ZSH_AUTOCOMPLETE_HACK") == "1" {
+				fmt.Printf("%s:%s\n", cmd.Name, cmd.Usage)
+			} else {
+				fmt.Println(cmd.Name)
+			}
 		}
 	}
+	os.Exit(0)
 }
 
 //ListKeys lists keys at a given keypath
@@ -91,22 +96,43 @@ func ListProviderFlags(ctx *cli.Context) (keepGoing bool) {
 // ListAllFlags all possible flags
 func ListAllFlags(ctx *cli.Context) {
 	var flags []cli.Flag
-	if ctx.Command != nil {
+	if ctx.Command != nil && ctx.Command.Name != "" {
 		flags = ctx.Command.VisibleFlags()
 	} else {
 		flags = ctx.App.VisibleFlags()
 	}
 
+	isZSH := os.Getenv("_CLI_ZSH_AUTOCOMPLETE_HACK")
 	for _, f := range flags {
 		name := f.Names()[0]
 		if name == "init-completion" {
 			continue
 		}
 
+		description := ""
+		if isZSH == "1" {
+			switch typedFlag := f.(type) {
+			case *cli.StringFlag:
+				description = typedFlag.Usage
+			case *cli.BoolFlag:
+				description = typedFlag.Usage
+			case *cli.GenericFlag:
+				description = typedFlag.Usage
+			case *cli.StringSliceFlag:
+				description = typedFlag.Usage
+			default:
+				log.Warningf("%s: %T", name, typedFlag)
+			}
+		}
+
 		_, isRepeatable := f.(*cli.StringSliceFlag)
 
 		if isRepeatable || !ctx.IsSet(name) {
-			fmt.Println(fmt.Sprintf("--%s", name))
+			if isZSH == "1" {
+				fmt.Println(fmt.Sprintf("--%s:%s", name, description))
+			} else {
+				fmt.Println(fmt.Sprintf("--%s", name))
+			}
 		}
 	}
 }
@@ -139,7 +165,7 @@ func LastFlagIs(flagName string) (query string, ok bool) {
 
 func validArgs() (validArgs []string) {
 	for _, arg := range os.Args {
-		if arg == "--" || arg == "--generate-completion" {
+		if arg == "--" || arg == "--generate-bash-completion" {
 			break
 		}
 

@@ -72,7 +72,7 @@ build: dist build-deps dist/gcy-macos-amd64.tgz dist/gcy-linux-amd64.tgz debian
 build-xgo: dist
 	# produce debug-symbol stripped binaries
 	$(GOBIN)/xgo --image xgo \
-		--targets 'linux/amd64 darwin-10.10/amd64' \
+		--targets 'linux/amd64 linux/arm-7 darwin-10.10/amd64'
 		--out 'dist/gcy' \
 		--ldflags "-s -w -X main.version=$(shell sed 's/^v//' dist/VERSION)" \
 		$(ROOT_DIR)
@@ -83,7 +83,7 @@ compress-binaries:
 	docker run --rm --tty \
 		-v $(ROOT_DIR)/dist:/target \
 		--entrypoint upx \
-		xgo -9 --no-progress /target/gcy-linux-amd64 /target/gcy-macos-amd64
+		xgo -9 --no-progress /target/gcy-linux-amd64 /target/gcy-macos-amd64 /target/gcy-linux-arm-7
 
 build-local: dist
 	mkdir -p dist/local
@@ -102,13 +102,23 @@ dist/gcy-macos-amd64.tgz: docs build-xgo
 
 dist/gcy-linux-amd64.tgz: docs build-xgo
 	mkdir -p dist/linux
-	cp dist/gcy-linux-amd64 dist/linux/gcy
+	cp dist/gcy-linux-arm-7 dist/linux/gcy
 	cp -r bin/autocomplete dist/linux
 	cp -r dist/docs/man dist/linux
 	cp bin/build/linux.Makefile dist/linux/Makefile
 	tar -czf dist/gcy-linux-amd64.tgz -C "$(ROOT_DIR)/dist/linux" .
 	openssl dgst -sha256 dist/gcy-linux-amd64.tgz | awk '{print $$2}' > dist/gcy-linux-amd64.shasum
 	rm -rf dist/linux
+
+dist/gcy-linux-arm.tgz: docs build-xgo
+	mkdir -p dist/arm
+	cp dist/gcy-linux-arm dist/arm/gcy
+	cp -r bin/autocomplete dist/arm
+	cp -r dist/docs/man dist/arm
+	cp bin/build/linux.Makefile dist/arm/Makefile
+	tar -czf dist/gcy-linux-arm.tgz -C "$(ROOT_DIR)/dist/linux" .
+	openssl dgst -sha256 dist/gcy-linux-arm.tgz | awk '{print $$2}' > dist/gcy-linux-arm.shasum
+	rm -rf dist/arm
 
 build-deps:
 	cd / && GO111MODULE=auto go get -u src.techknowlogick.com/xgo

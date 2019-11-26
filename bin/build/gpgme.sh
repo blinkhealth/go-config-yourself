@@ -4,7 +4,7 @@
 set -o errexit
 
 BUILD_ROOT="/build-libs"
-targets=(linux darwin)
+targets=(linux darwin arm)
 gpgme="$BUILD_ROOT/gpgme"
 libs=("$BUILD_ROOT/libgpg-error" "$BUILD_ROOT/libassuan")
 for target in "${targets[@]}"; do
@@ -19,26 +19,43 @@ done
 # Quiet down
 export OSXCROSS_NO_INCLUDE_PATH_WARNINGS=1
 buildEnv() {
-  if [[ $1 == "darwin" ]]; then
-    HOST=x86_64-apple-darwin
-    # GPGME requires host to be different, but HOST to be set
-    # I don't quite understand why, but there's only that directory in the source
-    export GPGME_HOST='x86_64-apple-darwin15'
-    # use special compilers
-    export CC=o64-clang
-    export CXX=o64-clang++
-    # use special libtool and friends
-    export LIBTOOL="x86_64-apple-darwin15-libtool"
-    export AR="x86_64-apple-darwin15-ar"
-    export RANLIB="x86_64-apple-darwin15-ranlib"
-    # This is where the compiled targets go
-    export PREFIX=/usr/local/osx-ndk-x86/SDK/MacOSX10.11.sdk/usr
-    export PATH="/usr/local/osx-ndk-x86/bin:$PATH"
-  else
-    HOST=x86_64-linux
-    export GPGME_HOST="$HOST"
-    export PREFIX=/usr/local
-  fi
+  case $1 in
+    darwin)
+      HOST=x86_64-apple-darwin
+      # GPGME requires host to be different, but HOST to be set
+      # I don't quite understand why, but there's only that directory in the source
+      export GPGME_HOST='x86_64-apple-darwin15'
+      # use special compilers
+      export CC=o64-clang
+      export CXX=o64-clang++
+      # use special libtool and friends
+      export LIBTOOL="x86_64-apple-darwin15-libtool"
+      export AR="x86_64-apple-darwin15-ar"
+      export RANLIB="x86_64-apple-darwin15-ranlib"
+      # This is where the compiled targets go
+      export PREFIX=/usr/local/osx-ndk-x86/SDK/MacOSX10.11.sdk/usr
+      export PATH="/usr/local/osx-ndk-x86/bin:$PATH"
+      ;;
+    linux)
+      HOST=x86_64-linux
+      export GPGME_HOST="$HOST"
+      export PREFIX=/usr/local
+      ;;
+    arm)
+      HOST=arm-linux-gnueabihf
+      export GPGME_HOST="$HOST"
+      export CC=arm-linux-gnueabihf-gcc-5
+      export CXX=arm-linux-gnueabihf-g++-5
+      export PREFIX=/usr/arm-linux-gnueabihf
+      export CFLAGS="-march=armv7-a -fPIC"
+      export CXXFLAGS="-march=armv7-a -fPIC"
+      export PKG_CONFIG_PATH=/usr/arm-linux-gnueabihf/lib/pkgconfig
+      export AR="arm-linux-gnueabihf-ar"
+      export LD="arm-linux-gnueabihf-ld"
+      export CPP="arm-linux-gnueabihf-cpp-5"
+      export STRIP="arm-linux-gnueabihf-strip"
+      export RANLIB="arm-linux-gnueabihf-ranlib"
+  esac
   export HOST
 }
 

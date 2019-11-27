@@ -31,7 +31,7 @@ This repository contains code and documentation for the `gcy` command-line tool.
 ## OSX
 
 ```sh
-brew tap blinkhealth/opensource-formulas git@github.com:blinkhealth/opensource-formulas.git
+brew tap blinkhealth/opensource-formulas
 brew install blinkhealth/opensource-formulas/go-config-yourself
 ```
 

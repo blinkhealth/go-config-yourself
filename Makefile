@@ -8,12 +8,13 @@ BUILD_HOST := $(shell uname -s | tr '[[:upper:]]' '[[:lower:]]')
 BINARY := dist/$(BUILD_HOST)/go-config-yourself
 export GO111MODULE=on
 
-complete: build-local
+autocomplete-test: build-local
 	mv dist/local/gcy dist/local/asdf
 	rm /usr/local/share/zsh/site-functions/_asdf || true
-	cp bin/autocomplete/completion.zsh /usr/local/share/zsh/site-functions/_asdf
+	sed 's/gcy/asdf/' bin/autocomplete/completion.zsh > /usr/local/share/zsh/site-functions/_asdf
 	rm ~/.zcompdump*
-	#now run rehash && compinit
+	# now run rehash && compinit
+	# test with `asdf [TAB]`
 
 # --------------
 # Dev setup

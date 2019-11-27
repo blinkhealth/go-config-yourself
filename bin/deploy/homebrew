@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Creates a PR on blinkhealth/opensource-formulas with an updated stable version
+# Creates a PR on blinkhealth/homebrew-opensource-formulas with an updated stable version
 set -o nounset
 
 VERSION=$(cat dist/VERSION)
@@ -12,7 +12,7 @@ function gh () {
   local path repo
   case "$1" in
     gcy) repo="go-config-yourself" ;;
-    brew) repo="opensource-formulas" ;;
+    brew) repo="homebrew-opensource-formulas" ;;
   esac
   shift
   path="$1"

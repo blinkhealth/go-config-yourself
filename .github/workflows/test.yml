@@ -49,7 +49,7 @@ jobs:
           PATH="$(go env GOPATH)/bin:$PATH" make coverage
 
       - name: CLI test
-        run: PATH="$PATH:/tmp/bc/bin" make integration-test
+        run: PATH="$PATH:/tmp/gcy/bin" make integration-test
 
       - name: Push coverage results to Coveralls
         uses: shogo82148/actions-goveralls@v1

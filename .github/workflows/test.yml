@@ -20,6 +20,15 @@ jobs:
             ${{ runner.OS }}-go-${{ env.cache-name }}-
             ${{ runner.OS }}-go-
 
+      - name: Cache bats
+        uses: actions/cache@v1
+        with:
+          path: /tmp/gcy/bats
+          key: ${{ runner.OS }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.OS }}-go-${{ env.cache-name }}-
+            ${{ runner.OS }}-go-
+
       - name: Install dependencies
         run: |
           mkdir -p /tmp/gcy
@@ -36,7 +45,7 @@ jobs:
         run: PATH="$(go env GOPATH)/bin:$PATH" make lint
 
       - name: Unit test
-        run: PATH="$(go env GOPATH)/bin:$PATH" REPORTS="/tmp/bc" make coverage
+        run: PATH="$(go env GOPATH)/bin:$PATH" make coverage
 
       - name: CLI test
         run: PATH="$PATH:/tmp/bc/bin" make integration-test
@@ -45,4 +54,4 @@ jobs:
         uses: shogo82148/actions-goveralls@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-profile: /tmp/gcy/coverage.out
+          path-to-profile: test/reports/coverage.out

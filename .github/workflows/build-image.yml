@@ -1,9 +1,9 @@
 # disabled due to error when uploading large images to Github's
 # package registry
-on: push
-push:
-  branches:
-    - chore/build-xgo
+on:
+  push:
+    branches:
+      - chore/build-xgo
 name: Publish build image
 jobs:
   build:

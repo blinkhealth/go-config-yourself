@@ -2,6 +2,7 @@
 
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 REPORTS ?= ./test/reports
+XGO_IMAGE ?= docker.pkg.github.com/blinkhealth/go-config-yourself/xgo:latest
 
 BUILD_HOST := $(shell uname -s | tr '[[:upper:]]' '[[:lower:]]')
 BINARY := dist/$(BUILD_HOST)/go-config-yourself
@@ -62,7 +63,7 @@ build: dist build-deps dist/gcy-macos-amd64.tgz dist/gcy-linux-amd64.tgz debian
 
 build-xgo: dist
 	# produce debug-symbol stripped binaries
-	$(GOBIN)/xgo --image xgo \
+	$(GOBIN)/xgo --image $(XGO_IMAGE) \
 		--targets 'linux/amd64 linux/arm-7 darwin-10.10/amd64' \
 		--out 'dist/gcy' \
 		--ldflags "-s -w -X main.version=$(shell sed 's/^v//' dist/VERSION)" \
@@ -74,7 +75,7 @@ compress-binaries:
 	docker run --rm --tty \
 		-v $(ROOT_DIR)/dist:/target \
 		--entrypoint upx \
-		xgo -9 --no-progress /target/gcy-linux-amd64 /target/gcy-macos-amd64 /target/gcy-linux-arm-7
+		$(XGO_IMAGE) -9 --no-progress /target/gcy-linux-amd64 /target/gcy-macos-amd64 /target/gcy-linux-arm-7
 
 build-local: dist
 	mkdir -p dist/local
@@ -113,7 +114,6 @@ dist/gcy-linux-arm.tgz: docs build-xgo
 
 build-deps:
 	cd / && GO111MODULE=auto go get -u src.techknowlogick.com/xgo
-	docker build --tag xgo ./bin/build/
 
 # --------------
 # Documentation

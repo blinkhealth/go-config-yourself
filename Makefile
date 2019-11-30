@@ -2,7 +2,7 @@
 
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 REPORTS ?= ./test/reports
-XGO_IMAGE ?= docker.pkg.github.com/blinkhealth/go-config-yourself/xgo:latest
+XGO_IMAGE ?= unrob/xgo-upx-gpgme:latest
 
 BUILD_HOST := $(shell uname -s | tr '[[:upper:]]' '[[:lower:]]')
 BINARY := dist/$(BUILD_HOST)/go-config-yourself
@@ -75,7 +75,8 @@ compress-binaries:
 	docker run --rm --tty \
 		-v $(ROOT_DIR)/dist:/target \
 		--entrypoint upx \
-		$(XGO_IMAGE) -9 --no-progress /target/gcy-linux-amd64 /target/gcy-macos-amd64 /target/gcy-linux-arm-7
+		$(XGO_IMAGE) -9 --no-progress \
+		/target/gcy-linux-amd64 /target/gcy-macos-amd64 /target/gcy-linux-arm-7
 
 build-local: dist
 	mkdir -p dist/local

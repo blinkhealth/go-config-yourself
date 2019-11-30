@@ -4,7 +4,7 @@
 set -o errexit
 
 BUILD_ROOT="/build-libs"
-targets=(linux darwin arm)
+targets=(linux arm darwin)
 gpgme="$BUILD_ROOT/gpgme"
 libs=("$BUILD_ROOT/libgpg-error" "$BUILD_ROOT/libassuan")
 for target in "${targets[@]}"; do
@@ -55,6 +55,9 @@ buildEnv() {
       export CPP="arm-linux-gnueabihf-cpp-5"
       export STRIP="arm-linux-gnueabihf-strip"
       export RANLIB="arm-linux-gnueabihf-ranlib"
+      ;;
+    default)
+      >&2 echo "Unknown target $1"
   esac
   export HOST
 }

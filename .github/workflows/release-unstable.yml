@@ -41,7 +41,7 @@ jobs:
 
       - name: Build packages
         run: |
-          export GOPATH="$HOME/go"
+          export PATH="$(go env GOPATH)/bin:$PATH"
           make build
           export VERSION="$(cat dist/VERSION)"
 
@@ -53,7 +53,9 @@ jobs:
             diff="$parentVersion...HEAD"
           fi
 
+          echo "Changelog for $diff"
           export CHANGELOG=$(git log --pretty=format:'- %h %s%n' $diff | sed -e '/^$/d;')
+          echo $CHANGELOG
 
       - name: Create pre-release
         uses: actions/create-release@v1
@@ -62,7 +64,7 @@ jobs:
         with:
           # tag_name: ${{ env.VERSION }}
           tag_name: test-delete-me
-          release_name: Pre-release ${{ github.ref }}
+          release_name: Pre-release ${{ env.VERSION }}
           body: ${{ env.changelog }}
           draft: false
           prerelease: true

@@ -3,6 +3,8 @@
 set -o nounset
 
 packages=(linux-amd64 linux-arm macos-amd64)
+UPLOAD_URL="${UPLOAD_URL%%{*}"
+echo "Uploading to $UPLOAD_URL"
 
 for platform in "${packages[@]}"; do
   echo "Uploading $platform binary to release"

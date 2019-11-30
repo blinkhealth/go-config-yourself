@@ -6,7 +6,6 @@ XGO_IMAGE ?= unrob/xgo-upx-gpgme:latest
 
 BUILD_HOST := $(shell uname -s | tr '[[:upper:]]' '[[:lower:]]')
 BINARY := dist/$(BUILD_HOST)/go-config-yourself
-GOBIN := $(GOPATH)/bin
 export GO111MODULE=on
 
 # --------------
@@ -63,7 +62,7 @@ build: dist build-deps dist/gcy-macos-amd64.tgz dist/gcy-linux-amd64.tgz debian
 
 build-xgo: dist
 	# produce debug-symbol stripped binaries
-	$(GOBIN)/xgo --image $(XGO_IMAGE) \
+	xgo --image $(XGO_IMAGE) \
 		--targets 'linux/amd64 linux/arm-7 darwin-10.10/amd64' \
 		--out 'dist/gcy' \
 		--ldflags "-s -w -X main.version=$(shell sed 's/^v//' dist/VERSION)" \

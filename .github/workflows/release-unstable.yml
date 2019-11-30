@@ -1,0 +1,87 @@
+on: push
+# push:
+#   branches:
+#     - master
+name: Unstable Release
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.12.x
+
+      - uses: actions/checkout@v1
+
+      - name: Cache go modules
+        uses: actions/cache@v1
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.OS }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.OS }}-go-${{ env.cache-name }}-
+            ${{ runner.OS }}-go-
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gdebi debhelper devscripts libgpgme11-dev
+          curl -LO https://github.com/jgm/pandoc/releases/download/2.7.3/pandoc-2.7.3-1-amd64.deb
+          sudo gdebi --non-interactive ./pandoc-2.7.3-1-amd64.deb
+
+      - name: Setup GPG
+        env:
+          config_password: ${{ secrets.CONFIG_PASSWORD }}
+        run: |
+          go get
+          make build-local
+          ./dist/local/gcy get bin/deploy/config.yml gpg.key > key.asc
+          gpg --import key.asc
+
+      - name: Build packages
+        id: build
+        outputs:
+          version:
+            description: The built version package
+        run: |
+          make build
+          echo "::set-output name=version::$(cat dist/VERSION)"
+
+      - name: Get pre-release info
+        id: info
+        outputs:
+          changelog:
+            description: A list of commits for this release
+        run: |
+          parentVersion=$(git describe --abbrev=0 --tags --exclude "${{ steps.build.outputs.version }}" 2>/dev/null)
+
+          if [[ "$parentVersion" == "" ]]; then
+            diff=""
+          else
+            diff="$parentVersion...HEAD"
+          fi
+
+          changelog=$(git log --pretty=format:'- %h %s%n' $diff | sed -e '/^$/d;')
+
+      - name: Create pre-release
+        id: release
+        uses: actions/create-release@v1
+        outputs:
+          upload_url:
+            description: This release's upload url
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # tag_name: ${{ steps.build.outputs.version }}
+          tag_name: test-delete-me
+          release_name: Pre-release ${{ github.ref }}
+          body: ${{ steps.info.outputs.changelog }}
+          draft: false
+          prerelease: true
+
+      - name: Upload packages to github release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_URL: ${{ steps.release.outputs.upload_url }}
+        run: ./bin/deploy/release-assets

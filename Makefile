@@ -49,12 +49,8 @@ test-deps:
 	cd / && GO111MODULE=auto go get -u gotest.tools/gotestsum github.com/golangci/golangci-lint/cmd/golangci-lint
 
 # --------------
-# Release
+# Build
 # --------------
-release: build
-	$(ROOT_DIR)/bin/deploy/github
-	$(ROOT_DIR)/bin/deploy/homebrew
-
 dist:
 	mkdir -p dist
 	./bin/build/version.sh > dist/VERSION

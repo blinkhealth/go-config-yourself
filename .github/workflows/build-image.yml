@@ -19,6 +19,8 @@ jobs:
           docker build --tag docker.pkg.github.com/blinkhealth/go-config-yourself/xgo:latest ./bin/build/
 
       - name: Publish Docker image
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           docker login docker.pkg.github.com --username blinkhealth --password "$GITHUB_TOKEN"
           docker push docker.pkg.github.com/blinkhealth/go-config-yourself/xgo:latest

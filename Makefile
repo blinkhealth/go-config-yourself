@@ -42,12 +42,7 @@ test/gcy:
 		-o test/gcy
 
 coverage:
-	mkdir -p $(REPORTS)/coverage
-	mkdir -p $(REPORTS)/reports
-	gotestsum --format short-verbose --junitfile $(REPORTS)/reports/unit.xml -- ./... -tags test -coverprofile=$(REPORTS)/coverage/profile --coverpkg=./...
-	grep -vE '(go-config-yourself|commands)/[^/]+\.go' $(REPORTS)/coverage/profile > $(REPORTS)/unit.out
-	go tool cover -html=$(REPORTS)/unit.out -o=$(REPORTS)/coverage/unit.html
-	rm $(REPORTS)/unit.out
+	gotestsum --format short-verbose -- ./... -tags test -coverprofile=$(REPORTS)/coverage.out --coverpkg=./...
 
 test-deps:
 	# install outside package dir so go.sum is not affected

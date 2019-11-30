@@ -94,7 +94,7 @@ dist/gcy-macos-amd64.tgz: docs build-xgo
 
 dist/gcy-linux-amd64.tgz: docs build-xgo
 	mkdir -p dist/linux
-	cp dist/gcy-linux-arm-7 dist/linux/gcy
+	cp dist/gcy-linux-amd64 dist/linux/gcy
 	cp -r bin/autocomplete dist/linux
 	cp -r dist/docs/man dist/linux
 	cp bin/build/linux.Makefile dist/linux/Makefile
@@ -104,7 +104,7 @@ dist/gcy-linux-amd64.tgz: docs build-xgo
 
 dist/gcy-linux-arm.tgz: docs build-xgo
 	mkdir -p dist/arm
-	cp dist/gcy-linux-arm dist/arm/gcy
+	cp dist/gcy-linux-arm-7 dist/arm/gcy
 	cp -r bin/autocomplete dist/arm
 	cp -r dist/docs/man dist/arm
 	cp bin/build/linux.Makefile dist/arm/Makefile

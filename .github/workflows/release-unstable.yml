@@ -41,7 +41,7 @@ jobs:
 
       - name: Build packages
         run: |
-          export PATH="$(go env GOPATH)/bin:$PATH"
+          export PATH="$HOME/go/bin:$PATH"
           make build
           export VERSION="$(cat dist/VERSION)"
 

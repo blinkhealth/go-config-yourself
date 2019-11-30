@@ -25,19 +25,19 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get update
           sudo apt-get install -y gdebi debhelper devscripts libgpgme11-dev
           curl -LO https://github.com/jgm/pandoc/releases/download/2.7.3/pandoc-2.7.3-1-amd64.deb
           sudo gdebi --non-interactive ./pandoc-2.7.3-1-amd64.deb
 
       - name: Setup GPG
         env:
-          config_password: ${{ secrets.CONFIG_PASSWORD }}
+          CONFIG_PASSWORD: ${{ secrets.CONFIG_PASSWORD }}
         run: |
           go get
           make build-local
           ./dist/local/gcy get bin/deploy/config.yml gpg.key > key.asc
           gpg --import key.asc
+          rm -rf key.asc
 
       - name: Build packages
         run: |

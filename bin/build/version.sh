@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 bare_ref="${GITHUB_REF##*/}"
->&2 echo "Persisting version <$bare_ref>"
 if [[ $bare_ref =~ ^v([0-9]+).([0-9]+).([0-9]+)$ ]]; then
   # For a stable tag, grab from github and exit
   echo -n "$bare_ref"

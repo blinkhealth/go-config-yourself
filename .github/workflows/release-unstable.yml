@@ -40,21 +40,11 @@ jobs:
           gpg --import key.asc
 
       - name: Build packages
-        id: build
-        outputs:
-          version:
-            description: The built version package
         run: |
           make build
-          echo "::set-output name=version::$(cat dist/VERSION)"
+          export VERSION="$(cat dist/VERSION)"
 
-      - name: Get pre-release info
-        id: info
-        outputs:
-          changelog:
-            description: A list of commits for this release
-        run: |
-          parentVersion=$(git describe --abbrev=0 --tags --exclude "${{ steps.build.outputs.version }}" 2>/dev/null)
+          parentVersion=$(git describe --abbrev=0 --tags --exclude "${VERSION}" 2>/dev/null)
 
           if [[ "$parentVersion" == "" ]]; then
             diff=""
@@ -62,7 +52,7 @@ jobs:
             diff="$parentVersion...HEAD"
           fi
 
-          changelog=$(git log --pretty=format:'- %h %s%n' $diff | sed -e '/^$/d;')
+          export CHANGELOG=$(git log --pretty=format:'- %h %s%n' $diff | sed -e '/^$/d;')
 
       - name: Create pre-release
         id: release
@@ -73,10 +63,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # tag_name: ${{ steps.build.outputs.version }}
+          # tag_name: ${{ env.VERSION }}
           tag_name: test-delete-me
           release_name: Pre-release ${{ github.ref }}
-          body: ${{ steps.info.outputs.changelog }}
+          body: ${{ env.changelog }}
           draft: false
           prerelease: true
 

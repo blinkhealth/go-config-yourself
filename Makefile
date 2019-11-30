@@ -108,7 +108,7 @@ dist/gcy-linux-arm.tgz: docs build-xgo
 	cp -r bin/autocomplete dist/arm
 	cp -r dist/docs/man dist/arm
 	cp bin/build/linux.Makefile dist/arm/Makefile
-	tar -czf dist/gcy-linux-arm.tgz -C "$(ROOT_DIR)/dist/linux" .
+	tar -czf dist/gcy-linux-arm.tgz -C "$(ROOT_DIR)/dist/arm" .
 	openssl dgst -sha256 dist/gcy-linux-arm.tgz | awk '{print $$2}' > dist/gcy-linux-arm.shasum
 	rm -rf dist/arm
 

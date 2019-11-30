@@ -55,11 +55,7 @@ jobs:
           export CHANGELOG=$(git log --pretty=format:'- %h %s%n' $diff | sed -e '/^$/d;')
 
       - name: Create pre-release
-        id: release
         uses: actions/create-release@v1
-        outputs:
-          upload_url:
-            description: This release's upload url
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

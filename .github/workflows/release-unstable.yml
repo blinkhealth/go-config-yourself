@@ -1,7 +1,7 @@
-on: push
-# push:
-#   branches:
-#     - master
+on:
+  push:
+    branches:
+      - master
 name: Unstable Release
 jobs:
   release:
@@ -63,8 +63,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # tag_name: ${{ env.VERSION }}
-          tag_name: test-delete-me
+          tag_name: ${{ env.VERSION }}
           release_name: Pre-release ${{ env.VERSION }}
           body: ${{ env.changelog }}
           draft: false

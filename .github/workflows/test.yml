@@ -35,7 +35,8 @@ jobs:
           sudo apt-get install -y libgpgme-dev
           go mod download
           make test-deps
-          if [[ ! -d /tmp/gcy/bin/bats ]]; then
+          if [[ ! -f /tmp/gcy/bin/bats ]]; then
+            rm -rf /tmp/gcy/bin/bats
             git clone https://github.com/bats-core/bats-core.git /tmp/gcy/bats
             cd /tmp/gcy/bats
             ./install.sh /tmp/gcy

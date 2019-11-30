@@ -24,10 +24,9 @@ jobs:
         uses: actions/cache@v1
         with:
           path: /tmp/gcy/bats
-          key: ${{ runner.OS }}-go-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.OS }}-bats
           restore-keys: |
-            ${{ runner.OS }}-go-${{ env.cache-name }}-
-            ${{ runner.OS }}-go-
+            ${{ runner.OS }}-bats
 
       - name: Install dependencies
         run: |
@@ -45,7 +44,9 @@ jobs:
         run: PATH="$(go env GOPATH)/bin:$PATH" make lint
 
       - name: Unit test
-        run: PATH="$(go env GOPATH)/bin:$PATH" make coverage
+        run: |
+          mkdir -p ./test/reports
+          PATH="$(go env GOPATH)/bin:$PATH" make coverage
 
       - name: CLI test
         run: PATH="$PATH:/tmp/bc/bin" make integration-test

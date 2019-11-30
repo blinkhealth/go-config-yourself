@@ -72,7 +72,7 @@ build: dist build-deps dist/gcy-macos-amd64.tgz dist/gcy-linux-amd64.tgz debian
 build-xgo: dist
 	# produce debug-symbol stripped binaries
 	$(GOBIN)/xgo --image xgo \
-		--targets 'linux/amd64 linux/arm-7 darwin-10.10/amd64'
+		--targets 'linux/amd64 linux/arm-7 darwin-10.10/amd64' \
 		--out 'dist/gcy' \
 		--ldflags "-s -w -X main.version=$(shell sed 's/^v//' dist/VERSION)" \
 		$(ROOT_DIR)

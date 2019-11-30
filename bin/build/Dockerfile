@@ -1,4 +1,5 @@
-FROM techknowlogick/xgo:go-1.11.8
+FROM techknowlogick/xgo:go-1.12.x
+# see https://github.com/techknowlogick/xgo
 # Used by go-config-yourself to cross compile to MacOS and Linux from CircleCI
 
 ENV GPGME_VERSION "1.13.0"
@@ -29,3 +30,5 @@ COPY gpgme.sh /build-libs
 RUN /build-libs/gpgme.sh
 # clean up
 RUN rm -rf /build-libs
+# specify correct prefix for osx cgo builds
+RUN sed -i 's|GOOS=darwin GOARCH=amd64|GOOS=darwin GOARCH=amd64 CGO_CFLAGS="-I/usr/local/osx-ndk-x86/SDK/MacOSX10.11.sdk/usr/include" CGO_LDFLAGS="-L/usr/local/osx-ndk-x86/SDK/MacOSX10.11.sdk/usr/lib"|' /build.sh

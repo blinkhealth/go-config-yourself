@@ -1,6 +1,7 @@
 # go-config-yourself
 
-[![CircleCI](https://circleci.com/gh/blinkhealth/go-config-yourself.svg?style=svg)](https://circleci.com/gh/blinkhealth/go-config-yourself)
+[![Test status](https://github.com/blinkhealth/go-config-yourself/workflows/Tests/badge.svg)](https://github.com/blinkhealth/go-config-yourself/actions?query=branch%3Amaster+event%3Apush)
+[![Coverage Status](https://coveralls.io/repos/github/blinkhealth/go-config-yourself/badge.svg?branch=master)](https://coveralls.io/github/blinkhealth/go-config-yourself?branch=master)
 
 A secrets-management CLI tool and language-specific runtimes to deal with everyday application configuration right from your repository. **go-config-yourself** aims to simplify the management of secrets from your terminal and their use within application code. Configuration files are kept as human-readable as possible, so change management is easily achievable in any version-control system (like git).
 

@@ -39,7 +39,7 @@ jobs:
         run: REPORTS="/tmp/bc" make coverage
 
       - name: CLI test
-        command: PATH="$PATH:/tmp/bc/bin" make integration-test
+        run: PATH="$PATH:/tmp/bc/bin" make integration-test
 
       - name: Push coverage results to Coveralls
         uses: shogo82148/actions-goveralls@v1

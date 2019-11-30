@@ -58,7 +58,7 @@ dist:
 debian:
 	$(ROOT_DIR)/bin/build/debian
 
-build: dist build-deps dist/gcy-macos-amd64.tgz dist/gcy-linux-amd64.tgz debian
+build: dist build-deps dist/gcy-macos-amd64.tgz dist/gcy-linux-amd64.tgz dist/gcy-linux-arm.tgz debian
 
 build-xgo: dist
 	# produce debug-symbol stripped binaries

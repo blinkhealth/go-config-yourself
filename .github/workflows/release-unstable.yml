@@ -44,6 +44,7 @@ jobs:
           export PATH="$(go env GOPATH)/bin:$PATH"
           make build
           export VERSION="$(cat dist/VERSION)"
+          echo "::set-env name=VERSION::$VERSION"
 
           parentVersion=$(git describe --abbrev=0 --tags --exclude "${VERSION}" 2>/dev/null)
 
@@ -56,6 +57,7 @@ jobs:
           echo "Changelog for $diff"
           export CHANGELOG=$(git log --pretty=format:'- %h %s%n' $diff | sed -e '/^$/d;')
           echo $CHANGELOG
+          echo "::set-env name=CHANGELOG::$CHANGELOG"
 
       - name: Create pre-release
         id: release
@@ -65,7 +67,7 @@ jobs:
         with:
           tag_name: ${{ env.VERSION }}
           release_name: Pre-release ${{ env.VERSION }}
-          body: ${{ env.changelog }}
+          body: ${{ env.CHANGELOG }}
           draft: false
           prerelease: true
 

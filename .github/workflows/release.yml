@@ -44,11 +44,13 @@ jobs:
           export PATH="$(go env GOPATH)/bin:$PATH"
           make build
           export VERSION="$(cat dist/VERSION)"
+          echo "::set-env name=VERSION::$VERSION"
 
       - name: Get release upload url
         run: |
           release_url="https://api.github.com/repos/blinkhealth/go-config-yourself/releases/tags/${VERSION}"
           export UPLOAD_URL="$(curl --silent "$release_url" | jq -r '.upload_url')"
+          echo "::set-env name=UPLOAD_URL::$UPLOAD_URL"
 
       - name: Upload packages to github release
         env:
@@ -80,6 +82,11 @@ jobs:
           export SHASUM="$(curl --silent --fail --show-error -L "$download_url/$VERSION/gcy-macos-amd64.shasum")"
           export PACKAGE="$DOWNLOAD_URL/$VERSION/gcy-macos-amd64.tgz"
           export DASHED_VERSION "${VERSION//./-}"
+
+          echo "::set-env name=VERSION::$VERSION"
+          echo "::set-env name=DASHED_VERSION::$DASHED_VERSION"
+          echo "::set-env name=SHASUM::$SHASUM"
+          echo "::set-env name=PACKAGE::$PACKAGE"
 
       - name: Update homebrew formula locally
         run: |

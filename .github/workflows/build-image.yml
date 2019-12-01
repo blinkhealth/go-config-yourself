@@ -1,0 +1,28 @@
+# disabled due to error when uploading large images to Github's
+# package registry
+on:
+  push:
+    branches:
+      - chore/build-xgo
+name: Publish build image
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.12.x
+
+      - uses: actions/checkout@v1
+
+      - name: Build Docker image
+        run: |
+          docker build --tag docker.pkg.github.com/blinkhealth/go-config-yourself/xgo:latest ./bin/build/
+
+      - name: Publish Docker image
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          docker login docker.pkg.github.com --username blinkhealth --password "$GITHUB_TOKEN"
+          docker push docker.pkg.github.com/blinkhealth/go-config-yourself/xgo:latest

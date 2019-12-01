@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Requires a GITHUB_TOKEN and a Github release's UPLOAD_URL
+set -o nounset
+
+packages=(linux-amd64 linux-arm macos-amd64)
+UPLOAD_URL="${UPLOAD_URL%%{*}"
+echo "Uploading to $UPLOAD_URL"
+
+for platform in "${packages[@]}"; do
+  echo "Uploading $platform binary to release"
+  set -o errexit
+  curl --silent \
+    --show-error \
+    --fail \
+    -XPOST \
+    -H 'Content-type: application/gzip' \
+    -H "Authorization: Bearer $GITHUB_TOKEN" \
+    --data-binary @"dist/gcy-$platform.tgz" \
+    "${UPLOAD_URL}?name=gcy-$platform.tgz&label=gcy-$platform" >/dev/null
+
+  echo "Uploading $platform shasum to release"
+  curl --silent \
+    --show-error \
+    --fail \
+    -XPOST \
+    -H 'Content-type: plain/text' \
+    -H "Authorization: Bearer $GITHUB_TOKEN" \
+    --data-binary @"dist/gcy-$platform.shasum" \
+    "${UPLOAD_URL}?name=gcy-$platform.shasum&label=shasum-gcy-$platform" >/dev/null
+  set +o errexit
+done
+
+echo "Uploading debian package to release"
+set -o errexit
+curl --silent \
+  --show-error \
+  --fail \
+  -XPOST \
+  -H 'Content-type: application/vnd.debian.binary-package' \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  --data-binary @"dist/gcy-linux-amd64.deb" \
+  "${UPLOAD_URL}?name=gcy-linux-amd64.deb&label=gcy-linux-amd64-deb" >/dev/null

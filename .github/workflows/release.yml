@@ -1,0 +1,112 @@
+on:
+  push:
+    tags:
+      - v[0-9]+.[0-9]+.[0-9]+
+name: Release
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.12.x
+
+      - uses: actions/checkout@v1
+
+      - name: Cache go modules
+        uses: actions/cache@v1
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.OS }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.OS }}-go-${{ env.cache-name }}-
+            ${{ runner.OS }}-go-
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y gdebi debhelper devscripts libgpgme11-dev
+          curl -LO https://github.com/jgm/pandoc/releases/download/2.7.3/pandoc-2.7.3-1-amd64.deb
+          sudo gdebi --non-interactive ./pandoc-2.7.3-1-amd64.deb
+
+      - name: Setup GPG
+        env:
+          CONFIG_PASSWORD: ${{ secrets.CONFIG_PASSWORD }}
+        run: |
+          go get
+          make build-local
+          ./dist/local/gcy get bin/deploy/config.yml gpg.key > key.asc
+          gpg --import key.asc
+          rm -rf key.asc
+
+      - name: Build packages
+        run: |
+          export PATH="$(go env GOPATH)/bin:$PATH"
+          make build
+          export VERSION="$(cat dist/VERSION)"
+
+      - name: Get release upload url
+        run: |
+          release_url="https://api.github.com/repos/blinkhealth/go-config-yourself/releases/tags/${VERSION}"
+          export UPLOAD_URL="$(curl --silent "$release_url" | jq -r '.upload_url')"
+
+      - name: Upload packages to github release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_URL: ${{ env.UPLOAD_URL }}
+        run: ./bin/deploy/release-assets
+
+      - name: update git pages
+        uses: JamesIves/github-pages-deploy-action@3.0.2
+        with:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          BRANCH: gh-pages
+          FOLDER: dist/docs/html
+
+  homebrew:
+    needs: [release]
+    steps:
+      - name: Checkout homebrew-opensource-formulas repo
+        uses: actions/checkout@v1
+        with:
+          repository: blinkhealth/homebrew-opensource-formulas
+          fetch-depth: 1
+
+      - name: Get release information
+        run: |
+          download_url="https://github.com/blinkhealth/go-config-yourself/releases/download/"
+
+          export VERSION="${GITHUB_REF##*/}"
+          export SHASUM="$(curl --silent --fail --show-error -L "$download_url/$VERSION/gcy-macos-amd64.shasum")"
+          export PACKAGE="$DOWNLOAD_URL/$VERSION/gcy-macos-amd64.tgz"
+          export DASHED_VERSION "${VERSION//./-}"
+
+      - name: Update homebrew formula locally
+        run: |
+          sed -i -E "s|url .*|url '${PACKAGE}'|;"go-config-yourself.rb
+          sed -i -E "s|sha256 .*|sha256 '${SHASUM}'|" go-config-yourself.rb
+          sed -i -E "s|version .*|version '${VERSION//v/}'|" go-config-yourself.rb
+
+      - name: Add changes to git
+        run: |
+          git add -A .
+          git config --local user.email "opensource+release-bot@blinkhealth.com"
+          git config --local user.name "Release Bot"
+          git commit -m 'Bump go-config-yourself to v${{ env.VERSION }}'
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          repository: blinkhealth/homebrew-opensource-formulas
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: chore/bump-go-config-yourself-${{ env.DASHED_VERSION }}
+
+      - name: Create PR on blinkhealth/homebrew-opensource-formulas
+        uses: gha-utilities/init-pull-request@v0.0.2
+        env:
+          GITHUB_REPOSITORY: blinkhealth/homebrew-opensource-formulas
+        with:
+          pull_request_token: ${{ secrets.GITHUB_TOKEN }}
+          head: chore/bump-go-config-yourself-${{ env.DASHED_VERSION }}
+          base: master
+          title: "Bump go-config-yourself to v${{ env.VERSION }}"

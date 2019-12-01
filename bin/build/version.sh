@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
 
-if [[ $CIRCLE_TAG != "" ]]; then
-  # when we're building a stable release
-  echo -n "$CIRCLE_TAG"
+bare_ref="${GITHUB_REF##*/}"
+if [[ $bare_ref =~ ^v([0-9]+).([0-9]+).([0-9]+)$ ]]; then
+  # For a stable tag, grab from github and exit
+  echo -n "$bare_ref"
   exit
-fi
-
-if [[ "$CIRCLE_SHA1" != "" ]]; then
-  # we get here on circleci when building from the mainline branch
-  sha="$CIRCLE_SHA1"
+elif [[ "$bare_ref" == "master" ]]; then
+  # from the mainline branch, grab the sha
+  sha="$GITHUB_SHA"
 else
-  # we get here building locally, i.e. make build-local
+  # from a local build
   sha="$(git rev-parse HEAD)+local.$(date -u +"%Y%m%dT%H%M%SZ")"
 fi
 

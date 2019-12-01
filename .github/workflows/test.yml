@@ -1,0 +1,60 @@
+on: push
+name: Tests
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.12.x
+
+      - name: Checkout source
+        uses: actions/checkout@v1
+
+      - name: Cache go modules
+        uses: actions/cache@v1
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.OS }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.OS }}-go-${{ env.cache-name }}-
+            ${{ runner.OS }}-go-
+
+      - name: Cache bats
+        uses: actions/cache@v1
+        with:
+          path: /tmp/gcy/bin
+          key: ${{ runner.OS }}-bats
+          restore-keys: |
+            ${{ runner.OS }}-bats
+
+      - name: Install dependencies
+        run: |
+          mkdir -p /tmp/gcy
+          sudo apt-get install -y libgpgme-dev
+          go mod download
+          make test-deps
+          if [[ ! -f /tmp/gcy/bin/bats ]]; then
+            rm -rf /tmp/gcy/bin/bats
+            git clone https://github.com/bats-core/bats-core.git /tmp/gcy/bats
+            cd /tmp/gcy/bats
+            ./install.sh /tmp/gcy
+          fi
+
+      - name: Lint
+        run: PATH="$(go env GOPATH)/bin:$PATH" make lint
+
+      - name: Unit test
+        run: |
+          mkdir -p ./test/reports
+          PATH="$(go env GOPATH)/bin:$PATH" make coverage
+
+      - name: CLI test
+        run: PATH="$PATH:/tmp/gcy/bin" make integration-test
+
+      - name: Push coverage results to Coveralls
+        uses: shogo82148/actions-goveralls@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-profile: test/reports/coverage.out

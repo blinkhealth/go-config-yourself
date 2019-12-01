@@ -2,10 +2,10 @@
 
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 REPORTS ?= ./test/reports
+XGO_IMAGE ?= unrob/xgo-upx-gpgme:latest
 
 BUILD_HOST := $(shell uname -s | tr '[[:upper:]]' '[[:lower:]]')
 BINARY := dist/$(BUILD_HOST)/go-config-yourself
-GOBIN := $(GOPATH)/bin
 export GO111MODULE=on
 
 # --------------
@@ -42,24 +42,15 @@ test/gcy:
 		-o test/gcy
 
 coverage:
-	mkdir -p $(REPORTS)/coverage
-	mkdir -p $(REPORTS)/reports
-	gotestsum --format short-verbose --junitfile $(REPORTS)/reports/unit.xml -- ./... -tags test -coverprofile=$(REPORTS)/coverage/profile --coverpkg=./...
-	grep -vE '(go-config-yourself|commands)/[^/]+\.go' $(REPORTS)/coverage/profile > $(REPORTS)/unit.out
-	go tool cover -html=$(REPORTS)/unit.out -o=$(REPORTS)/coverage/unit.html
-	rm $(REPORTS)/unit.out
+	gotestsum --format short-verbose -- ./... -tags test -coverprofile=$(REPORTS)/coverage.out --coverpkg=./...
 
 test-deps:
 	# install outside package dir so go.sum is not affected
 	cd / && GO111MODULE=auto go get -u gotest.tools/gotestsum github.com/golangci/golangci-lint/cmd/golangci-lint
 
 # --------------
-# Release
+# Build
 # --------------
-release: build
-	$(ROOT_DIR)/bin/deploy/github
-	$(ROOT_DIR)/bin/deploy/homebrew
-
 dist:
 	mkdir -p dist
 	./bin/build/version.sh > dist/VERSION
@@ -67,11 +58,11 @@ dist:
 debian:
 	$(ROOT_DIR)/bin/build/debian
 
-build: dist build-deps dist/gcy-macos-amd64.tgz dist/gcy-linux-amd64.tgz debian
+build: dist build-deps dist/gcy-macos-amd64.tgz dist/gcy-linux-amd64.tgz dist/gcy-linux-arm.tgz debian
 
 build-xgo: dist
 	# produce debug-symbol stripped binaries
-	$(GOBIN)/xgo --image xgo \
+	xgo --image $(XGO_IMAGE) \
 		--targets 'linux/amd64 linux/arm-7 darwin-10.10/amd64' \
 		--out 'dist/gcy' \
 		--ldflags "-s -w -X main.version=$(shell sed 's/^v//' dist/VERSION)" \
@@ -83,7 +74,8 @@ compress-binaries:
 	docker run --rm --tty \
 		-v $(ROOT_DIR)/dist:/target \
 		--entrypoint upx \
-		xgo -9 --no-progress /target/gcy-linux-amd64 /target/gcy-macos-amd64 /target/gcy-linux-arm-7
+		$(XGO_IMAGE) -9 --no-progress \
+		/target/gcy-linux-amd64 /target/gcy-macos-amd64 /target/gcy-linux-arm-7
 
 build-local: dist
 	mkdir -p dist/local
@@ -102,7 +94,7 @@ dist/gcy-macos-amd64.tgz: docs build-xgo
 
 dist/gcy-linux-amd64.tgz: docs build-xgo
 	mkdir -p dist/linux
-	cp dist/gcy-linux-arm-7 dist/linux/gcy
+	cp dist/gcy-linux-amd64 dist/linux/gcy
 	cp -r bin/autocomplete dist/linux
 	cp -r dist/docs/man dist/linux
 	cp bin/build/linux.Makefile dist/linux/Makefile
@@ -112,17 +104,16 @@ dist/gcy-linux-amd64.tgz: docs build-xgo
 
 dist/gcy-linux-arm.tgz: docs build-xgo
 	mkdir -p dist/arm
-	cp dist/gcy-linux-arm dist/arm/gcy
+	cp dist/gcy-linux-arm-7 dist/arm/gcy
 	cp -r bin/autocomplete dist/arm
 	cp -r dist/docs/man dist/arm
 	cp bin/build/linux.Makefile dist/arm/Makefile
-	tar -czf dist/gcy-linux-arm.tgz -C "$(ROOT_DIR)/dist/linux" .
+	tar -czf dist/gcy-linux-arm.tgz -C "$(ROOT_DIR)/dist/arm" .
 	openssl dgst -sha256 dist/gcy-linux-arm.tgz | awk '{print $$2}' > dist/gcy-linux-arm.shasum
 	rm -rf dist/arm
 
 build-deps:
 	cd / && GO111MODULE=auto go get -u src.techknowlogick.com/xgo
-	docker build --tag xgo ./bin/build/
 
 # --------------
 # Documentation

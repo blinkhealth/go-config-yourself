@@ -24,7 +24,7 @@ jobs:
       - name: Cache bats
         uses: actions/cache@v1
         with:
-          path: /tmp/gcy/bin
+          path: /tmp/gcy
           key: ${{ runner.OS }}-bats
           restore-keys: |
             ${{ runner.OS }}-bats

@@ -38,6 +38,9 @@ var App = &cli.App{
 	Before: func(ctx *cli.Context) error {
 		if ctx.Bool("verbose") {
 			log.SetLevel(log.DebugLevel)
+			if ctx.IsSet("generate-bash-completion") {
+				return nil
+			}
 			log.Debug("Verbose output enabled")
 		}
 		return nil

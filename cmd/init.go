@@ -33,6 +33,7 @@ func init() {
 				if !autocomplete.ListProviderFlags(ctx) {
 					return
 				}
+				os.Exit(0)
 			}
 
 			if ctx.NArg() < 2 {

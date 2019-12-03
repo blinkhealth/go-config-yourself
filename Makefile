@@ -9,12 +9,18 @@ BINARY := dist/$(BUILD_HOST)/go-config-yourself
 export GO111MODULE=on
 
 autocomplete-test: build-local
-	mv dist/local/gcy dist/local/asdf
-	rm /usr/local/share/zsh/site-functions/_asdf || true
-	sed 's/gcy/asdf/' bin/autocomplete/completion.zsh > /usr/local/share/zsh/site-functions/_asdf
+	mv dist/local/gcy dist/local/qwer
+	rm /usr/local/share/zsh/site-functions/_qwer || true
+	sed 's/gcy/qwer/' bin/autocomplete/completion.zsh > /usr/local/share/zsh/site-functions/_qwer
 	rm ~/.zcompdump*
-	# now run rehash && compinit
-	# test with `asdf [TAB]`
+	# now run
+	# ---------------------------
+	# rehash && compinit
+	# source /usr/local/share/zsh/site-functions/_qwer
+	# export PATH="$(pwd)/dist/local:$PATH"
+	# compdef _qwer_zsh_autocomplete qwer
+	# ---------------------------
+	# then test with `qwer [TAB]`
 
 # --------------
 # Dev setup

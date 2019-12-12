@@ -21,7 +21,7 @@ func init() {
 	pvd.RegisterProvider("gpg", New, []pvd.Argument{
 		{
 			Name:        "public-key",
-			Description: "A gpg public key's identity: a fingerprint or email to use as a recipient to encrypt this file's data key. This option can be entered multiple times. If no recipients are specified, a list of available keys will be printed for the user to choose from.",
+			Description: "One gpg public key's identity (fingerprint or email) to use as a recipient to encrypt this file's data key. Pass multiple times for multiple recipients, or omit completely and `gcy` prompts you to select a key available to your gpg agent.",
 			Repeatable:  true,
 		},
 	})

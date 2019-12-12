@@ -21,8 +21,12 @@ func CommandAutocomplete(ctx *cli.Context) {
 	}
 
 	for _, cmd := range ctx.App.VisibleCommands() {
-		if strings.HasPrefix(cmd.Name, firstArg) {
-			fmt.Println(cmd.Name)
+		if firstArg == "" || strings.HasPrefix(cmd.Name, firstArg) {
+			if os.Getenv("_CLI_ZSH_AUTOCOMPLETE_HACK") == "1" {
+				fmt.Printf("%s:%s\n", cmd.Name, cmd.Usage)
+			} else {
+				fmt.Println(cmd.Name)
+			}
 		}
 	}
 }
@@ -59,7 +63,7 @@ func ListKeys(ctx *cli.Context) int {
 
 // ListProviderFlags lists available provider flags for an autocomplete context
 func ListProviderFlags(ctx *cli.Context) (keepGoing bool) {
-	firstArg := ctx.Args().Get(0)
+	query := os.Getenv("CUR")
 
 	if query, ok := LastFlagIs("provider"); !ctx.IsSet("provider") && ok {
 		found := false
@@ -81,7 +85,7 @@ func ListProviderFlags(ctx *cli.Context) (keepGoing bool) {
 		}
 	}
 
-	if ctx.NArg() == 0 || ctx.NArg() == 1 && firstArg[0] == '-' {
+	if ctx.NArg() == 0 || len(query) > 0 && query[0] == '-' {
 		ListAllFlags(ctx)
 	}
 
@@ -91,22 +95,35 @@ func ListProviderFlags(ctx *cli.Context) (keepGoing bool) {
 // ListAllFlags all possible flags
 func ListAllFlags(ctx *cli.Context) {
 	var flags []cli.Flag
-	if ctx.Command != nil {
+	if ctx.Command != nil && ctx.Command.Name != "" {
 		flags = ctx.Command.VisibleFlags()
 	} else {
 		flags = ctx.App.VisibleFlags()
 	}
 
+	query := ""
+	if strings.HasPrefix(os.Getenv("CUR"), "-") {
+		query = strings.TrimLeft(os.Getenv("CUR"), "-")
+	}
+
+	isZSH := os.Getenv("_CLI_ZSH_AUTOCOMPLETE_HACK")
 	for _, f := range flags {
 		name := f.Names()[0]
-		if name == "init-completion" {
+		if query != "" && !strings.HasPrefix(name, query) {
 			continue
 		}
+		// if name == "init-completion" {
+		// 	continue
+		// }
 
 		_, isRepeatable := f.(*cli.StringSliceFlag)
 
 		if isRepeatable || !ctx.IsSet(name) {
-			fmt.Println(fmt.Sprintf("--%s", name))
+			if isZSH == "1" {
+				fmt.Println(fmt.Sprintf("--%s:%s", name, flagDescription(f)))
+			} else {
+				fmt.Println(fmt.Sprintf("--%s", name))
+			}
 		}
 	}
 }
@@ -115,7 +132,6 @@ func ListAllFlags(ctx *cli.Context) {
 func LastFlagIs(flagName string) (query string, ok bool) {
 	args := validArgs()
 	argLen := len(args)
-	ok = false
 	if argLen < 1 {
 		return
 	}
@@ -139,11 +155,31 @@ func LastFlagIs(flagName string) (query string, ok bool) {
 
 func validArgs() (validArgs []string) {
 	for _, arg := range os.Args {
-		if arg == "--" || arg == "--generate-completion" {
+		if arg == "--" || arg == "--generate-bash-completion" {
 			break
 		}
 
 		validArgs = append(validArgs, arg)
+	}
+	return
+}
+
+func flagDescription(f cli.Flag) (description string) {
+	switch typedFlag := f.(type) {
+	case *cli.StringFlag:
+		description = typedFlag.Usage
+	case *cli.BoolFlag:
+		description = typedFlag.Usage
+	case *cli.GenericFlag:
+		description = typedFlag.Usage
+	case *cli.StringSliceFlag:
+		description = typedFlag.Usage
+	default:
+		log.Warningf("%s: %T", f.Names(), typedFlag)
+	}
+	if description != "" {
+		description = strings.SplitN(description, ".", 2)[0]
+		description = strings.ReplaceAll(description, ":", "—")
 	}
 	return
 }

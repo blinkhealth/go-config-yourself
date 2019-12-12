@@ -15,6 +15,7 @@ import (
 var allFlags = []string{
 	"--verbose",
 	"--version",
+	"--provider",
 }
 
 func TestMain(m *testing.M) {
@@ -24,47 +25,67 @@ func TestMain(m *testing.M) {
 
 func TestCommandAutoComplete(t *testing.T) {
 	mockedStdOut := fx.MockStdoutAndArgs()
-	comp.CommandAutocomplete(fx.MockCliCtx(nil))
+	mockCtx := fx.MockCliCtx(nil)
+	comp.CommandAutocomplete(mockCtx)
 	output := mockedStdOut()
 	options := strings.Split(output, "\n")
-	expected := []string{"command", ""}
+	expected := append(allFlags, "command", "")
 
 	if !diff.Equal(options, expected) {
-		t.Fatalf("Invalid output, got: %v, expected %v", options, expected)
+		t.Errorf("Invalid output, got: %v, expected %v", options, expected)
 	}
 }
 
 func TestListProviderFlags(t *testing.T) {
 	tests := []struct {
-		args []string
-		out  string
+		name     string
+		input    []string
+		expected []string
 	}{
-		{[]string{}, strings.Join(allFlags, "\n")},
-		{[]string{"-"}, strings.Join(allFlags, "\n")},
-		{[]string{"--ver"}, strings.Join(allFlags, "\n")},
-		{[]string{"--var"}, ""},
-		{[]string{"--provider"}, "gpg\nkms\npassword"},
-		{[]string{"--provider", "g"}, "gpg"},
-		{[]string{"init", "--provider", "gpg"}, strings.Join(allFlags, "\n")},
+		{"empty-args", []string{}, allFlags},
+		{"single-dash", []string{"-"}, allFlags},
+		{"complete-ver", []string{"--ver"}, []string{"--verbose", "--version"}},
+		{"expect-empty", []string{"--var"}, []string{}},
+		{"provider", []string{"--provider"}, []string{"gpg", "kms", "password"}},
+		{"provider-query", []string{"--provider", "g"}, []string{"gpg"}},
+		{"post-provider", []string{"--provider", "gpg", "-"}, []string{"--verbose", "--version"}},
 	}
 
 	for _, tst := range tests {
-		out := fx.MockStdoutAndArgs()
+		tst := tst
+		t.Run(tst.name, func(t *testing.T) {
+			out := fx.MockStdoutAndArgs()
+			ctx := fx.MockCliCtx(tst.input)
+			comp.ListProviderFlags(ctx)
 
-		ctx := fx.MockCliCtx(tst.args)
-		comp.ListProviderFlags(ctx)
-
-		if out := out(); out != tst.out {
-			log.Errorf("Invalid output: %s", out)
-		}
+			outStr := out()
+			trimmed := strings.TrimSuffix(outStr, "\n")
+			got := []string{}
+			if trimmed != "" {
+				got = strings.Split(trimmed, "\n")
+			}
+			if !diff.Equal(got, tst.expected) {
+				t.Errorf("Invalid output: %+v", got)
+			}
+		})
 	}
+}
 
+func TestSubCommandFlags(t *testing.T) {
 	out := fx.MockStdoutAndArgs()
 	ctx := fx.MockCliCtx([]string{"command"})
 	ctx.Command = ctx.App.Commands[0]
 	comp.ListAllFlags(ctx)
-	if out := out(); out != "--keypath\n--flag" {
-		log.Errorf("Bad command flags: %s", out)
+
+	outStr := out()
+	trimmed := strings.TrimSuffix(outStr, "\n")
+	got := []string{}
+	if trimmed != "" {
+		got = strings.Split(trimmed, "\n")
+	}
+
+	if !diff.Equal(got, []string{"--flag"}) {
+		t.Errorf("Invalid command flags: %v", got)
 	}
 }
 
@@ -104,7 +125,7 @@ func TestListKeys(t *testing.T) {
 	defer out()
 	ctx := fx.MockCliCtx([]string{"something-random"})
 	if code := comp.ListKeys(ctx); code != 99 {
-		log.Error("List keys did not fail with bad pathname")
+		t.Error("List keys did not fail with bad pathname")
 	}
 }
 

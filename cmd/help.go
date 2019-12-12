@@ -108,6 +108,10 @@ secretColor:
 
 `
 
+func multiLineDescription(lines ...string) string {
+	return strings.Join(lines, "\n\n")
+}
+
 func helpCommandAction(ctx *cli.Context) error {
 	App.CommandNotFound(ctx, ctx.Command.Name)
 	return nil

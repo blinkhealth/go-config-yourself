@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/proglottis/gpgme"
 	log "github.com/sirupsen/logrus"
@@ -110,8 +111,31 @@ func MockStdoutAndArgs() func() string {
 	}
 }
 
+// providerFlag implements urfave/cli.v2/Generic
+type providerFlag struct {
+	Available []string
+	Default   string
+	selected  string
+}
+
+func (e *providerFlag) Set(value string) error {
+	for _, enum := range e.Available {
+		if enum == value {
+			e.selected = value
+			return nil
+		}
+	}
+	// return nil
+	return fmt.Errorf("Unknown provider %s; available providers are %s", value, strings.Join(e.Available, ", "))
+}
+
+func (e providerFlag) String() string {
+	return e.selected
+}
+
 // MockCliCtx returns a mock cli.Context for given arguments
 func MockCliCtx(args []string) *cli.Context {
+	providerList := []string{"kms", "gpg", "password"}
 	app := &cli.App{
 		Name: "test-app",
 		Flags: []cli.Flag{
@@ -124,6 +148,13 @@ func MockCliCtx(args []string) *cli.Context {
 				Name:    "version",
 				Value:   false,
 				Aliases: []string{"V"},
+			},
+			&cli.GenericFlag{
+				Name:        "provider",
+				Aliases:     []string{"p"},
+				Usage:       "Provider",
+				Value:       &providerFlag{Available: providerList},
+				DefaultText: "aws",
 			},
 		},
 		Version: "beta",
@@ -147,14 +178,37 @@ func MockCliCtx(args []string) *cli.Context {
 		},
 	}
 
-	set := flag.NewFlagSet("", 0)
+	cli.VersionFlag = &cli.BoolFlag{
+		Name:    "version",
+		Aliases: []string{"V"},
+		Usage:   "print the version",
+	}
+
+	set := flag.NewFlagSet("mock", flag.ContinueOnError)
+	set.SetOutput(ioutil.Discard)
 	if args != nil {
 		if len(args) > 0 {
 			os.Setenv("CUR", args[len(args)-1])
 		}
 		os.Args = args
+
+		for _, flag := range app.Flags {
+			if !flagInSet(flag, set) {
+				_ = flag.Apply(set)
+			}
+		}
 		_ = set.Parse(args)
 	}
+
 	ctx := cli.NewContext(app, set, nil)
 	return ctx
+}
+
+func flagInSet(flag cli.Flag, set *flag.FlagSet) bool {
+	for _, name := range flag.Names() {
+		if existing := set.Lookup(name); existing != nil {
+			return true
+		}
+	}
+	return false
 }

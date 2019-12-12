@@ -31,7 +31,7 @@ This repository contains code and documentation for the `gcy` command-line tool.
 ## OSX
 
 ```sh
-brew tap blinkhealth/opensource-formulas git@github.com:blinkhealth/opensource-formulas.git
+brew tap blinkhealth/opensource-formulas
 brew install blinkhealth/opensource-formulas/go-config-yourself
 ```
 
@@ -88,19 +88,15 @@ man gcy-password
 gcy --verbose # ...rest of the command
 ```
 
-
-
 ## `init`
 
 ```sh
 gcy init [options] CONFIG_FILE
 ```
 
-Creates a YAML config file at `CONFIG_FILE`
+Creates a YAML config file at `CONFIG_FILE`.
 
-`gcy init` will select the `aws` provider by default, and you can override it with the `--provider` flag.
-
-If needed, `gcy init` will query your provider for a list of keys to choose from when using the `aws` or `gpg` providers, and a password will be prompted for when using the `password` provider.
+If needed, `gcy init` will query your provider for a list of keys to choose from when using the `aws` or `gpg` providers, and a password will be prompted for when using the `password` provider. `gcy init` will select the `aws` provider by default, and you can override it with the `--provider` flag.
 
 See `gcy help config-file` for more information about `CONFIG_FILE`.
 
@@ -108,9 +104,9 @@ See `gcy help config-file` for more information about `CONFIG_FILE`.
 
 - `--provider value`, `-p value`: The provider to encrypt values with (value is one of: [kms](pkg/crypto/kms), [gpg](pkg/crypto/gpg), [password](pkg/crypto/password))
 - `--key value`: The AWS KMS key ARN to use.
-- `--public-key value`: A gpg public key's identity: a fingerprint or email to use as a recipient to encrypt this file's data key. This option can be entered multiple times. If no recipients are specified, a list of available keys will be printed for the user to choose from.
+- `--public-key value`: One gpg public key's identity (fingerprint or email) to use as a recipient to encrypt this file's data key. Pass multiple times for multiple recipients, or omit completely and `gcy` prompts you to select a key available to your gpg agent.
 - `--password value`: A password to use for encryption and decryption. To prevent your shell from remembering the password in its history, start your command with a space: `[space]gcy ...`. Can be set via the environment variable: `CONFIG_PASSWORD`.
-- `--skip-password-validation`: Skips password validation, potentially making encrypted secrets easier to crack
+- `--skip-password-validation`: Skips password validation, potentially making encrypted secrets easier to crack.
 
 ```sh
 # For kms
@@ -144,7 +140,7 @@ crypto:
 gcy set [options] CONFIG_FILE KEYPATH
 ```
 
-Stores a value at `KEYPATH`, encrypting it by default, and saves it to `CONFIG_FILE`
+Stores a value at `KEYPATH`, encrypting it by default, and saves it to `CONFIG_FILE`.
 
 `KEYPATH` is a dot-delimited path to values, see `gcy help keypath` for examples.
 
@@ -158,7 +154,6 @@ If a `defaults` or `default` file with the same extension as `CONFIG_FILE` exist
 
 - `-p|--plain-text`: Store the value as plain text with no encryption
 - `-i|--input-file PATH`: Use the specified file path instead of prompting for input from `stdin`
-
 
 ```sh
 gcy set --plain-text config-up-there.yml someInt # user inputs "1"
@@ -211,9 +206,11 @@ someSecret:
 gcy get CONFIG_FILE KEYPATH
 ```
 
-Outputs the plain-text value for `KEYPATH` in `CONFIG_FILE`. If the queried value is a dictionary, it will be encoded as JSON, with all of the encrypted values within decrypted.
+Outputs the plain-text value for `KEYPATH` in `CONFIG_FILE`.
 
-`KEYPATH` refers to a dot-delimited path to values, see `gcy help keypath` for examples. If a given `KEYPATH` is not found in `CONFIG_FILE`, `gcy get` will fail with exit code 2.
+`KEYPATH` refers to a dot-delimited path to values, see `gcy help keypath` for examples.
+
+If the value at `KEYPATH` is a dictionary or a list, it will be encoded as JSON, with all of the encrypted values within decrypted. If no value `KEYPATH` exists, `gcy get` will fail with exit code 2.
 
 ```sh
 gcy get config-up-there.yml some.nested.object
@@ -248,9 +245,9 @@ By default, it will reuse the same provider for this operation, unless `--provid
 
 - `--provider value`, `-p value`: The provider to encrypt values with (value is one of: [kms](pkg/crypto/kms), [gpg](pkg/crypto/gpg), [password](pkg/crypto/password))
 - `--key value`: The AWS KMS key ARN to use.
-- `--public-key value`: A gpg public key's identity: a fingerprint or email to use as a recipient to encrypt this file's data key. This option can be entered multiple times. If no recipients are specified, a list of available keys will be printed for the user to choose from.
+- `--public-key value`: One gpg public key's identity (fingerprint or email) to use as a recipient to encrypt this file's data key. Pass multiple times for multiple recipients, or omit completely and `gcy` prompts you to select a key available to your gpg agent.
 - `--password value`: A password to use for encryption and decryption. To prevent your shell from remembering the password in its history, start your command with a space: `[space]gcy ...`. Can be set via the environment variable: `CONFIG_PASSWORD`.
-- `--skip-password-validation`: Skips password validation, potentially making encrypted secrets easier to crack
+- `--skip-password-validation`: Skips password validation, potentially making encrypted secrets easier to crack.
 
 ```sh
 gcy rekey config-up-there.yml
@@ -268,14 +265,14 @@ gcy rekey config-up-there.yml
 gcy rekey config-up-there.yml arn:aws:kms:an-aws-region:an-account:alias/an-alias
 
 # Rekey between AWS profiles by temporarily rekeying with a password
-export CONFIG_PASSWORD="VERY-INSECURE-TEMPORARY-PASSWORD"
+ export CONFIG_PASSWORD="VERY-INSECURE-TEMPORARY-PASSWORD"
 AWS_PROFILE=source gcy rekey --provider password config/file.yml
 AWS_PROFILE=destination gcy rekey --provider kms config/file.yml
 ```
 
 ### Shell completion
 
-`gcy` provides shell completion scripts for `bash` and `zsh`, and these should be installed by default with package managers.
+`gcy` provides shell completion scripts for `bash` and `zsh`, which will be installed automatically by package managers. Shell completion is available for commands, options, `CONFIG_FILE` and `KEYPATH`.
 
 ---
 

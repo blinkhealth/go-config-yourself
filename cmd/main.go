@@ -32,11 +32,15 @@ var App = &cli.App{
 			Name:    "verbose",
 			Value:   false,
 			Aliases: []string{"v"},
+			Usage:   "Print debug statements",
 		},
 	},
 	Before: func(ctx *cli.Context) error {
 		if ctx.Bool("verbose") {
 			log.SetLevel(log.DebugLevel)
+			if ctx.IsSet("generate-bash-completion") {
+				return nil
+			}
 			log.Debug("Verbose output enabled")
 		}
 		return nil
@@ -68,8 +72,6 @@ func Main(version string) {
 		Aliases: []string{"V"},
 		Usage:   "print the version",
 	}
-
-	// cli.BashCompletionFlag = true
 
 	cli.HelpPrinter = helpPrinter
 	cli.AppHelpTemplate = helpTemplateApp

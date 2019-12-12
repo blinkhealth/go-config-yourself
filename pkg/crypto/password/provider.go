@@ -40,7 +40,7 @@ func init() {
 		{
 			Name:        "skip-password-validation",
 			IsSwitch:    true,
-			Description: "Skips password validation, potentially making encrypted secrets easier to crack",
+			Description: "Skips password validation, potentially making encrypted secrets easier to crack.",
 		},
 	})
 }

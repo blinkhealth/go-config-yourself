@@ -13,8 +13,13 @@ import (
 )
 
 func init() {
-	const description = "Outputs the plain-text value for `KEYPATH` in `CONFIG_FILE`. If the queried value is a dictionary, it will be encoded as JSON, with all of the encrypted values within decrypted.\n\n" +
-		"`KEYPATH` refers to a dot-delimited path to values, see `gcy help keypath` for examples. If a given `KEYPATH` is not found in `CONFIG_FILE`, `gcy get` will fail with exit code 2."
+	description := multiLineDescription(
+		"Outputs the plain-text value for `KEYPATH` in `CONFIG_FILE`.",
+
+		"`KEYPATH` refers to a dot-delimited path to values, see `gcy help keypath` for examples.",
+
+		"If the value at `KEYPATH` is a dictionary or a list, it will be encoded as JSON, with all of the encrypted values within decrypted. If no value `KEYPATH` exists, `gcy get` will fail with exit code 2.",
+	)
 
 	App.Commands = append(App.Commands, &cli.Command{
 		Name:        "get",

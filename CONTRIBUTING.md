@@ -4,7 +4,7 @@ This project uses [Go Modules](https://github.com/golang/go/wiki/Modules), `go` 
 
 ## MacOS
 
-Developing on MacOS requires [homebrew](https://brew.sh/) to be installed on the system. Setting up your system for it is as easy as:
+Developing on MacOS requires [homebrew](https://brew.sh/) to be installed on the system. You can setup your environment by running:
 
 ```sh
 make setup-dev

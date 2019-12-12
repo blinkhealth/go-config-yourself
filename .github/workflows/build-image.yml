@@ -1,5 +1,4 @@
-# disabled due to error when uploading large images to Github's
-# package registry
+# disabled due to error when uploading large images to Github's package registry
 on:
   push:
     branches:

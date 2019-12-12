@@ -16,12 +16,17 @@ import (
 )
 
 func init() {
+	description := multiLineDescription(
+		"Stores a value at `KEYPATH`, encrypting it by default, and saves it to `CONFIG_FILE`.",
 
-	const description = "Stores a value at `KEYPATH`, encrypting it by default, and saves it to `CONFIG_FILE`\n\n" +
-		"`KEYPATH` is a dot-delimited path to values, see `gcy help keypath` for examples.\n\n" +
-		"`gcy set` prompts for input, unless a value is provided via `stdin` or the `--input-file` flag. Values will be interpreted with golang’s default JSON parser before storage, so for example the string `“true”` will be stored as the boolean `true`. Due to existing AWS KMS service limitations, `gcy set` will read up to 4096 bytes before exiting with an error and closing its input.\n\n" +
-		"A properly configured `crypto` property must exist `CONFIG_FILE` for encryption to succeed, `gcy set` will exit with a non-zero status code otherwise. See `gcy help config-file` for more information about `CONFIG_FILE`.\n\n" +
-		"If a `defaults` or `default` file with the same extension as `CONFIG_FILE` exists in the same directory, `gcy set` will add a nil value for `KEYPATH` in said file."
+		"`KEYPATH` is a dot-delimited path to values, see `gcy help keypath` for examples.",
+
+		"`gcy set` prompts for input, unless a value is provided via `stdin` or the `--input-file` flag. Values will be interpreted with golang’s default JSON parser before storage, so for example the string `“true”` will be stored as the boolean `true`. Due to existing AWS KMS service limitations, `gcy set` will read up to 4096 bytes before exiting with an error and closing its input.",
+
+		"A properly configured `crypto` property must exist `CONFIG_FILE` for encryption to succeed, `gcy set` will exit with a non-zero status code otherwise. See `gcy help config-file` for more information about `CONFIG_FILE`.",
+
+		"If a `defaults` or `default` file with the same extension as `CONFIG_FILE` exists in the same directory, `gcy set` will add a nil value for `KEYPATH` in said file.",
+	)
 
 	App.Commands = append(App.Commands, &cli.Command{
 		Name:        "set",
@@ -51,7 +56,9 @@ func init() {
 			},
 		},
 		BashComplete: func(ctx *cli.Context) {
-			if ctx.NArg() == 0 {
+			argCount := ctx.NArg()
+
+			if argCount == 0 {
 				autocomplete.ListAllFlags(ctx)
 				if !ctx.IsSet("input-file") {
 					if _, ok := autocomplete.LastFlagIs("input-file"); ok {
@@ -60,7 +67,7 @@ func init() {
 				}
 			}
 
-			if ctx.NArg() == 1 {
+			if argCount == 1 {
 				autocomplete.ListKeys(ctx)
 			}
 

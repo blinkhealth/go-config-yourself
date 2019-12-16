@@ -58,9 +58,9 @@ SOFTWARE.
   </style>
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
@@ -70,14 +70,16 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -86,9 +88,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -130,20 +132,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The GPG provider use an existing GPG agent to encrypt and decrypt a AES256 data key. Each individual secret is then encrypted using that key.</p>
 <p><code>go-config-yourself</code> interacts directly with the GPG agent using the <a href="https://gnupg.org/software/gpgme/index.html">gpgme library</a>, and thus, requires a GPG agent present and available.</p>
 <h2 id="example">Example</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb1-1" title="1"><span class="fu">crypto:</span></a>
-<a class="sourceLine" id="cb1-2" title="2">  <span class="fu">provider:</span><span class="at"> gpg</span></a>
-<a class="sourceLine" id="cb1-3" title="3">  <span class="fu">recipients:</span></a>
-<a class="sourceLine" id="cb1-4" title="4">    <span class="kw">-</span> test-software@blinkhealth.com</a>
-<a class="sourceLine" id="cb1-5" title="5"><span class="fu">  key:</span> <span class="st">|</span></a>
-<a class="sourceLine" id="cb1-6" title="6">    -----BEGIN PGP MESSAGE-----</a>
-<a class="sourceLine" id="cb1-7" title="7"></a>
-<a class="sourceLine" id="cb1-8" title="8">    hQEMA1XMevbqrQGfAQf+N40/YoVX9zTtlXGw2GDZmq4rbpv8DTDR0xCO1RUwyA23</a>
-<a class="sourceLine" id="cb1-9" title="9">    Y9+1t9N4wLel9FMaFx3oCNvFkWYcjKCvTmZrZ3jn1WEbuGUqnvlCWN....UdL41=</a>
-<a class="sourceLine" id="cb1-10" title="10">    -----END PGP MESSAGE-----</a>
-<a class="sourceLine" id="cb1-11" title="11"><span class="fu">zero:</span></a>
-<a class="sourceLine" id="cb1-12" title="12">  <span class="fu">ciphertext:</span><span class="at"> 0x6IenU6EEErLVMC65tFWnPItFnEI8E/6i3GiOc=</span></a>
-<a class="sourceLine" id="cb1-13" title="13">  <span class="fu">encrypted:</span><span class="at"> </span><span class="ch">true</span></a>
-<a class="sourceLine" id="cb1-14" title="14">  <span class="fu">hash:</span><span class="at"> 6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b</span></a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">crypto</span><span class="kw">:</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="at">  </span><span class="fu">provider</span><span class="kw">:</span><span class="at"> gpg</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="at">  </span><span class="fu">recipients</span><span class="kw">:</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="at">    </span><span class="kw">-</span><span class="at"> test-software@blinkhealth.com</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="fu">  key</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a>    -----BEGIN PGP MESSAGE-----</span>
+<span id="cb1-7"><a href="#cb1-7"></a></span>
+<span id="cb1-8"><a href="#cb1-8"></a>    hQEMA1XMevbqrQGfAQf+N40/YoVX9zTtlXGw2GDZmq4rbpv8DTDR0xCO1RUwyA23</span>
+<span id="cb1-9"><a href="#cb1-9"></a>    Y9+1t9N4wLel9FMaFx3oCNvFkWYcjKCvTmZrZ3jn1WEbuGUqnvlCWN....UdL41=</span>
+<span id="cb1-10"><a href="#cb1-10"></a>    -----END PGP MESSAGE-----</span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="fu">zero</span><span class="kw">:</span></span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="at">  </span><span class="fu">ciphertext</span><span class="kw">:</span><span class="at"> 0x6IenU6EEErLVMC65tFWnPItFnEI8E/6i3GiOc=</span></span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="at">  </span><span class="fu">encrypted</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb1-14"><a href="#cb1-14"></a><span class="at">  </span><span class="fu">hash</span><span class="kw">:</span><span class="at"> 6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b</span></span></code></pre></div>
 <h2 id="environment-variables">Environment variables</h2>
 <p>When using the <code>gpg</code> provider, these environment variables can affect the way <code>go-config-yourself</code> interacts with the GPG agent.</p>
 <ul>

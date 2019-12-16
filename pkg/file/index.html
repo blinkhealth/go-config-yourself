@@ -58,9 +58,9 @@ SOFTWARE.
   </style>
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
@@ -70,14 +70,16 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -86,9 +88,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -127,32 +129,33 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <body>
 <article class="markdown-body">
 <h1 id="go-config-yourselfpkgfile">go-config-yourself/pkg/file</h1>
+<p><a href="https://godoc.org/github.com/blinkhealth/go-config-yourself/pkg/file"><img src="https://godoc.org/github.com/blinkhealth/go-config-yourself/pkg/file?status.svg" /></a></p>
 <p>A library to read <code>go-config-yourself</code> config files from your golang application.</p>
 <h2 id="usage">Usage</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode go"><code class="sourceCode go"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">package</span> main</a>
-<a class="sourceLine" id="cb1-2" title="2"></a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="kw">import</span> <span class="st">&quot;fmt&quot;</span></a>
-<a class="sourceLine" id="cb1-4" title="4"><span class="kw">import</span> <span class="st">&quot;github.com/blinhealth/go-config-yourself/pkg/file&quot;</span></a>
-<a class="sourceLine" id="cb1-5" title="5"></a>
-<a class="sourceLine" id="cb1-6" title="6"><span class="kw">func</span> main() {</a>
-<a class="sourceLine" id="cb1-7" title="7">    cfg, err := file.Load(<span class="st">&quot;./config/my-file.yml&quot;</span>)</a>
-<a class="sourceLine" id="cb1-8" title="8">    <span class="kw">if</span> err != <span class="ot">nil</span> {</a>
-<a class="sourceLine" id="cb1-9" title="9">        <span class="bu">panic</span>(err)</a>
-<a class="sourceLine" id="cb1-10" title="10">    }</a>
-<a class="sourceLine" id="cb1-11" title="11"></a>
-<a class="sourceLine" id="cb1-12" title="12">    plaintextValue, err := cfg.Get(<span class="st">&quot;path.to.secret&quot;</span>)</a>
-<a class="sourceLine" id="cb1-13" title="13"></a>
-<a class="sourceLine" id="cb1-14" title="14">    <span class="kw">if</span> err == <span class="ot">nil</span> {</a>
-<a class="sourceLine" id="cb1-15" title="15">        fmt.Println(fmt.Sprintf(<span class="st">&quot;The password is %s&quot;</span>, plaintextValue))</a>
-<a class="sourceLine" id="cb1-16" title="16">        <span class="co">// Outputs: The password is hunter2</span></a>
-<a class="sourceLine" id="cb1-17" title="17">    }</a>
-<a class="sourceLine" id="cb1-18" title="18"></a>
-<a class="sourceLine" id="cb1-19" title="19">    mapOfValues, err := cfg.GetAll()</a>
-<a class="sourceLine" id="cb1-20" title="20">    <span class="kw">if</span> err == <span class="ot">nil</span> {</a>
-<a class="sourceLine" id="cb1-21" title="21">        fmt.Println(fmt.Sprintf(<span class="st">&quot;The file as a map looks like: %v&quot;</span>, mapOfValues))</a>
-<a class="sourceLine" id="cb1-22" title="22">        <span class="co">// Outputs: The file as a map looks like: map[string]...</span></a>
-<a class="sourceLine" id="cb1-23" title="23">    }</a>
-<a class="sourceLine" id="cb1-24" title="24">}</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">package</span> main</span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="kw">import</span> <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="kw">import</span> <span class="st">&quot;github.com/blinhealth/go-config-yourself/pkg/file&quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a></span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="kw">func</span> main() {</span>
+<span id="cb1-7"><a href="#cb1-7"></a>    cfg, err := file.Load(<span class="st">&quot;./config/my-file.yml&quot;</span>)</span>
+<span id="cb1-8"><a href="#cb1-8"></a>    <span class="kw">if</span> err != <span class="ot">nil</span> {</span>
+<span id="cb1-9"><a href="#cb1-9"></a>        <span class="bu">panic</span>(err)</span>
+<span id="cb1-10"><a href="#cb1-10"></a>    }</span>
+<span id="cb1-11"><a href="#cb1-11"></a></span>
+<span id="cb1-12"><a href="#cb1-12"></a>    plaintextValue, err := cfg.Get(<span class="st">&quot;path.to.secret&quot;</span>)</span>
+<span id="cb1-13"><a href="#cb1-13"></a></span>
+<span id="cb1-14"><a href="#cb1-14"></a>    <span class="kw">if</span> err == <span class="ot">nil</span> {</span>
+<span id="cb1-15"><a href="#cb1-15"></a>        fmt.Println(fmt.Sprintf(<span class="st">&quot;The password is %s&quot;</span>, plaintextValue))</span>
+<span id="cb1-16"><a href="#cb1-16"></a>        <span class="co">// Outputs: The password is hunter2</span></span>
+<span id="cb1-17"><a href="#cb1-17"></a>    }</span>
+<span id="cb1-18"><a href="#cb1-18"></a></span>
+<span id="cb1-19"><a href="#cb1-19"></a>    mapOfValues, err := cfg.GetAll()</span>
+<span id="cb1-20"><a href="#cb1-20"></a>    <span class="kw">if</span> err == <span class="ot">nil</span> {</span>
+<span id="cb1-21"><a href="#cb1-21"></a>        fmt.Println(fmt.Sprintf(<span class="st">&quot;The file as a map looks like: %v&quot;</span>, mapOfValues))</span>
+<span id="cb1-22"><a href="#cb1-22"></a>        <span class="co">// Outputs: The file as a map looks like: map[string]...</span></span>
+<span id="cb1-23"><a href="#cb1-23"></a>    }</span>
+<span id="cb1-24"><a href="#cb1-24"></a>}</span></code></pre></div>
 </article>
 </body>
 </html>

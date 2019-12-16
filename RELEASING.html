@@ -68,19 +68,14 @@ SOFTWARE.
 <p>Releasing stable builds takes a few short steps:</p>
 <ol type="1">
 <li>Create a Github release with a changelog.</li>
-</ol>
-<p>Then, automation will:</p>
-<ol type="1">
-<li>A CircleCI job will be triggered and built artifacts deployed to Github.</li>
-<li>A pull request in the <a href="https://github.com/blinkhealth/opensource-formulas/pulls">Homebrew formulae repo</a> will be opened for this version.</li>
-<li>A debian package will be published to the <a href="https://launchpad.net/~blinkhealth/+archive/ubuntu/stable">stable ppa</a>.</li>
+<li>The <a href="/.github/workflows/release.yml">Release action</a> job will be triggered and built artifacts deployed to Github.</li>
+<li>A pull request in the <a href="https://github.com/blinkhealth/homebrew-opensource-formulas/pulls">Homebrew formulae repo</a> will be opened for this version.</li>
 <li><a href="https://blinkhealth.github.com/go-config-yourself">Documentation</a> will be published.</li>
 </ol>
 <h2 id="unstable-builds">Unstable builds</h2>
 <p>Every merge to the mainline branch triggers the creation of a pre-release in Github.</p>
 <ol type="1">
-<li>A CircleCI job will be triggered and built artifacts deployed to Github.</li>
-<li>A debian package will be published to the <a href="https://launchpad.net/~blinkhealth/+archive/ubuntu/unstable">unstable ppa</a></li>
+<li>The <a href="/.github/workflows/release-unstable.yml">Unstable Release action</a> job will be triggered and built artifacts deployed to Github.</li>
 </ol>
 </article>
 </body>

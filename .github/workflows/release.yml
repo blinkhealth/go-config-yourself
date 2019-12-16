@@ -74,6 +74,7 @@ jobs:
         with:
           repository: blinkhealth/homebrew-opensource-formulas
           fetch-depth: 1
+          ref: master
 
       - name: Get release information
         run: |

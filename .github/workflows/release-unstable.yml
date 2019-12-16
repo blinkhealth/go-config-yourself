@@ -2,6 +2,17 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - ".github/**"
+      - "bin/githooks/**"
+      - "test/**"
+      - ".editorconfig"
+      - ".gitignore"
+      - ".golangci.yml"
+      - "Brewfile"
+      - "CODEOWNERS"
+      - "LICENSE"
+      - "NOTICE"
 name: Unstable Release
 jobs:
   release:

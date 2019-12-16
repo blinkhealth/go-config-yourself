@@ -66,6 +66,7 @@ jobs:
           FOLDER: dist/docs/html
 
   homebrew:
+    runs-on: ubuntu-latest
     needs: [release]
     steps:
       - name: Checkout homebrew-opensource-formulas repo

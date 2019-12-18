@@ -54,6 +54,9 @@ func createAWSSession(region string) (sess *session.Session, config *aws.Config)
 }
 
 func newKMSService(region string) (svc *kmsService) {
+	if region == "" {
+		region = "us-east-1"
+	}
 	awsSess, awsConfig := createAWSSession(region)
 
 	return &kmsService{

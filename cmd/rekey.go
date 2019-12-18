@@ -64,7 +64,7 @@ func rekey(ctx *cli.Context) (err error) {
 
 	newConfig, err := originalConfig.Rekey(newProvider, args)
 	if err != nil {
-		return Exit(ExitCodeToolError, 3)
+		return Exit(err, ExitCodeToolError)
 	}
 
 	if err := util.SerializeAndWrite(fileName, newConfig); err != nil {

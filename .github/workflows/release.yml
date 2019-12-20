@@ -83,7 +83,7 @@ jobs:
           export VERSION="${GITHUB_REF##*/}"
           export SHASUM="$(curl --silent --fail --show-error -L "$download_url/$VERSION/gcy-macos-amd64.shasum")"
           export PACKAGE="$DOWNLOAD_URL/$VERSION/gcy-macos-amd64.tgz"
-          export DASHED_VERSION "${VERSION//./-}"
+          export DASHED_VERSION="${VERSION//./-}"
 
           echo "::set-env name=VERSION::$VERSION"
           echo "::set-env name=DASHED_VERSION::$DASHED_VERSION"

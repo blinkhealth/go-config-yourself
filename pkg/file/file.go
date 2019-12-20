@@ -68,7 +68,10 @@ func (cfg *ConfigFile) Get(keyPath string) (value interface{}, err error) {
 		return nil, err
 	}
 
-	value, err = decryptNode(node, cfg.crypto)
+	// nodes can be nil when the key exists and its value is nil
+	if node != nil {
+		value, err = decryptNode(node, cfg.crypto)
+	}
 	return
 }
 

@@ -92,7 +92,7 @@ jobs:
 
       - name: Update homebrew formula locally
         run: |
-          sed -i -E "s|url .*|url '${PACKAGE}'|;"go-config-yourself.rb
+          sed -i -E "s|url .*|url '${PACKAGE}'|" go-config-yourself.rb
           sed -i -E "s|sha256 .*|sha256 '${SHASUM}'|" go-config-yourself.rb
           sed -i -E "s|version .*|version '${VERSION//v/}'|" go-config-yourself.rb
 

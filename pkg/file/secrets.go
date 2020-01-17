@@ -33,6 +33,10 @@ func (cryptoDisabledError) Error() string {
 }
 
 func decryptNode(node *yaml.Tree, provider pvd.Crypto) (interface{}, error) {
+	if node == nil {
+		return nil, nil
+	}
+
 	if node.IsMap() {
 		if node.IsEncrypted() {
 			if provider == nil || !provider.Enabled() {

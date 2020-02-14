@@ -12,7 +12,7 @@ jobs:
         with:
           go-version: 1.12.x
 
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
       - name: Cache go modules
         uses: actions/cache@v1
@@ -70,19 +70,20 @@ jobs:
     needs: [release]
     steps:
       - name: Checkout homebrew-opensource-formulas repo
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
+          token: ${{ secrets.GITHUB_PAT }}
           repository: blinkhealth/homebrew-opensource-formulas
           fetch-depth: 1
           ref: master
 
       - name: Get release information
         run: |
-          download_url="https://github.com/blinkhealth/go-config-yourself/releases/download/"
+          download_url="https://github.com/blinkhealth/go-config-yourself/releases/download"
 
           export VERSION="${GITHUB_REF##*/}"
           export SHASUM="$(curl --silent --fail --show-error -L "$download_url/$VERSION/gcy-macos-amd64.shasum")"
-          export PACKAGE="$DOWNLOAD_URL/$VERSION/gcy-macos-amd64.tgz"
+          export PACKAGE="$download_url/$VERSION/gcy-macos-amd64.tgz"
           export DASHED_VERSION="${VERSION//./-}"
 
           echo "::set-env name=VERSION::$VERSION"
@@ -95,27 +96,14 @@ jobs:
           sed -i -E "s|url .*|url '${PACKAGE}'|" go-config-yourself.rb
           sed -i -E "s|sha256 .*|sha256 '${SHASUM}'|" go-config-yourself.rb
           sed -i -E "s|version .*|version '${VERSION//v/}'|" go-config-yourself.rb
+          git diff
 
-      - name: Add changes to git
-        run: |
-          git add -A .
-          git config --local user.email "opensource+release-bot@blinkhealth.com"
-          git config --local user.name "Release Bot"
-          git commit -m 'Bump go-config-yourself to v${{ env.VERSION }}'
-
-      - name: Push changes
-        uses: ad-m/github-push-action@master
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v2
         with:
-          repository: blinkhealth/homebrew-opensource-formulas
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_PAT }}
+          committer: Release Bot <opensource+go-config-yourself-github-action@blinkhealth.com>
+          commit-message: Bump go-config-yourself to ${{ env.VERSION }}
+          title: Bump go-config-yourself to ${{ env.VERSION }}
+          body: "Automated PR created from blinkhealth/go-config-yourself"
           branch: chore/bump-go-config-yourself-${{ env.DASHED_VERSION }}
-
-      - name: Create PR on blinkhealth/homebrew-opensource-formulas
-        uses: gha-utilities/init-pull-request@v0.0.2
-        env:
-          GITHUB_REPOSITORY: blinkhealth/homebrew-opensource-formulas
-        with:
-          pull_request_token: ${{ secrets.GITHUB_TOKEN }}
-          head: chore/bump-go-config-yourself-${{ env.DASHED_VERSION }}
-          base: master
-          title: "Bump go-config-yourself to v${{ env.VERSION }}"

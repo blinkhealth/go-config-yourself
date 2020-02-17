@@ -27,11 +27,11 @@ type mockKey struct {
 
 var BadCreds = awserr.New("NoCredentialProviders", "invalid-access-key", nil)
 var mockKeys = []*mockKey{
-	&mockKey{
+	{
 		id:     "arn:aws:kms:us-east-1:000000000000:key/00000000-0000-0000-0000-000000000000",
 		errors: false,
 	},
-	&mockKey{
+	{
 		id:        "arn:aws:kms:us-east-1:111111111111:key/11111111-1111-1111-1111-111111111111",
 		errors:    true,
 		errorCode: "NoCredentialProviders",
@@ -113,7 +113,7 @@ func (m *mockKMSClient) ListAliasesWithContext(context aws.Context, input *awsKM
 	}
 	regionalKey := strings.Replace(mockKeys[0].id, "us-east-1", m.region, 1)
 	aliases := []*awsKMS.AliasListEntry{
-		&awsKMS.AliasListEntry{
+		{
 			AliasArn: &regionalKey,
 		},
 	}

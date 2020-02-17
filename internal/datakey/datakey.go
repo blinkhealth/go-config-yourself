@@ -28,7 +28,7 @@ type Service struct {
 	key []byte
 }
 
-// Fills a slice with random bytes
+// RandomBytes fills a slice with random bytes
 func RandomBytes(value *[]byte) error {
 	_, err := rand.Read(*value)
 	if err != nil {

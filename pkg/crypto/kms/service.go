@@ -115,9 +115,9 @@ func (svc *kmsService) ListKeys() (keys []string, err error) {
 					if awsErr.Code() != "UnrecognizedClientException" {
 						listingErrors <- err
 						return
-					} else {
-						log.Warningf("Unable to query possibly disabled region %s for keys, ignoring", region)
 					}
+
+					log.Warningf("Unable to query possibly disabled region %s for keys, ignoring", region)
 				} else {
 					listingErrors <- fmt.Errorf("Error querying for keys in %s: %s", region, err)
 					return

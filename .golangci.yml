@@ -1,20 +1,35 @@
+# cilint author made some choices I don't like, such as
+# no comments for exported vars (which make docs nice )
+
 issues:
+  exclude-use-default: false
   exclude:
     - ST1005
+    - G104
+    - G304
+  exclude-rules:
+    - text: Error return value of .((os\.)?std(out|err)\..*|.*Close|.*Flush|os\.Remove(All)?|.*printf?|os\.(Un)?Setenv). is not checked
+      linters:
+        - errcheck
+    - text: error strings should not be capitalized
+      linters:
+        - golint
+
 linters:
-  fast: true
+  fast: false
   enable:
     - goconst
     - gocritic
     - gocyclo
+    - gofmt
+    - golint
     - goimports
-    - stylecheck
-    - interfacer
     - gosec
+    - interfacer
     - maligned
     - misspell
     - prealloc
     - scopelint
+    - stylecheck
     - unconvert
     - unparam
-

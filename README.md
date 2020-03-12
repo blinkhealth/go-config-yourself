@@ -61,8 +61,8 @@ apt install ./gcy-linux-amd64.deb
 
 ```sh
 last_release="https://api.github.com/repos/blinkhealth/go-config-yourself/releases/latest"
-version=$(curl --silent "$last_release" | awk -F'"' '/tag_name/{print $4}' )
-curl -vO https://github.com/blinkhealth/go-config-yourself/releases/download/$version/gcy-linux-amd64.tar.gz
+version=$(wget --silent "$last_release" | awk -F'"' '/tag_name/{print $4}' )
+wget -vO https://github.com/blinkhealth/go-config-yourself/releases/download/$version/gcy-linux-amd64.tgz
 tar xfz gcy-linux-amd64.tar.gz
 make install
 ```

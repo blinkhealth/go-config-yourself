@@ -84,6 +84,7 @@ func SelectionFromList(list []string, prompt string, takeMultiple bool) (output 
 		Label:    prompt,
 		Items:    list,
 		Size:     10,
+		Stdin:    os.Stdin,
 		Searcher: searcher,
 		Templates: &promptui.SelectTemplates{
 			Help: "Move: ← ↓ ↑ →, search: /",
@@ -92,9 +93,8 @@ func SelectionFromList(list []string, prompt string, takeMultiple bool) (output 
 
 	selected, err := runUI(ui)
 
-	if err != nil {
-		fmt.Printf("Prompt failed %v\n", err)
-		return
+	if err != nil && err != io.EOF {
+		return output, fmt.Errorf("Prompt failed: %q", err)
 	}
 
 	output = append(output, selected)

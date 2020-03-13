@@ -33,13 +33,13 @@ func Example() {
 	if plaintextValue, err = cfg.Get("path.to.secret"); err == nil {
 		return
 	}
-	fmt.Println(fmt.Sprintf("The password is %s", plaintextValue))
+	fmt.Printf("The password is %s\n", plaintextValue)
 	// Outputs: The password is 🤫
 
 	// Or get all of them at once, decrypted as a map
 	mapOfValues, err := cfg.GetAll()
 	if err == nil {
-		fmt.Println(fmt.Sprintf("The file as a map looks like: %v", mapOfValues))
+		fmt.Printf("The file as a map looks like: %v\n", mapOfValues)
 		// Outputs: The file as a map looks like: map[string]...
 	}
 

@@ -120,9 +120,9 @@ func ListAllFlags(ctx *cli.Context) {
 
 		if isRepeatable || !ctx.IsSet(name) {
 			if isZSH == "1" {
-				fmt.Println(fmt.Sprintf("--%s:%s", name, flagDescription(f)))
+				fmt.Printf("--%s:%s\n", name, flagDescription(f))
 			} else {
-				fmt.Println(fmt.Sprintf("--%s", name))
+				fmt.Printf("--%s\n", name)
 			}
 		}
 	}

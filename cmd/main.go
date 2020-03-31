@@ -18,11 +18,12 @@ import (
 	cli "github.com/urfave/cli/v2"
 )
 
+// App is a cli.App skeleton
 var App = &cli.App{
 	Name:  "gcy",
 	Usage: "gcy COMMAND CONFIG_FILE [KEYPATH]",
 	Authors: []*cli.Author{
-		&cli.Author{
+		{
 			Name:  "Blink Health",
 			Email: "opensource@blinkhealth.com",
 		},
@@ -55,6 +56,8 @@ var App = &cli.App{
 		os.Exit(1)
 	},
 }
+
+// KeyFlags point to a list of cli flags for key-related operations
 var KeyFlags = util.KeyFlags()
 
 // Main main function for go-config-yourself

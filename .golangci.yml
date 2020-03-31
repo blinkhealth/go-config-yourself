@@ -1,20 +1,43 @@
+# cilint author made some choices I don't like, such as
+# no comments for exported vars (which make docs nice )
+
 issues:
+  exclude-use-default: false
   exclude:
     - ST1005
+    - G104
+    - G304
+  exclude-rules:
+    - text: Error return value of .((os\.)?std(out|err)\..*|.*Close|.*Flush|os\.Remove(All)?|.*printf?|os\.(Un)?Setenv). is not checked
+      linters:
+        - errcheck
+    - text: error strings should not be capitalized
+      linters:
+        - golint
+    # todo: use stretchr/testify to abstract cyclomatic complexity under the rug
+    - path: _test\.go
+      linters:
+        - gocyclo
+
+linters-settings:
+  gocyclo:
+    min-complexity: 15
+
 linters:
-  fast: true
+  fast: false
   enable:
     - goconst
     - gocritic
     - gocyclo
+    - gofmt
+    - golint
     - goimports
-    - stylecheck
-    - interfacer
     - gosec
+    - interfacer
     - maligned
     - misspell
     - prealloc
     - scopelint
+    - stylecheck
     - unconvert
     - unparam
-

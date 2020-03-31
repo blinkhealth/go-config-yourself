@@ -16,7 +16,9 @@ import (
 type mockKey string
 
 const (
+	// MockKMSKey is what the key arn used by the test suite
 	MockKMSKey mockKey = "arn:aws:kms:us-east-1:000000000000:key/00000000-AAAA-1111-BBBB-CC22DD33EE44"
+	//MockGPGKey is the key name used by the test suite
 	MockGPGKey mockKey = "test-software@blinkhealth.com"
 )
 

@@ -1,3 +1,4 @@
+// Package fixtures contains testing methods and data
 package fixtures
 
 import (

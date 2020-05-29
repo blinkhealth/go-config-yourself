@@ -18,3 +18,9 @@ load "conftest"
   bc set $file newSecret <<<"a new secret"
   [[ "$(bc get $file newSecret)" == *'a new secret'* ]]
 }
+
+@test "get literal dot reads everything" {
+  file=$(fixture encrypted.kms)
+  [[ "$(bc get $file . | jq -r 'keys | length')" == '9' ]]
+  [[ "$(bc get $file . | openssl dgst -md5)" == '687d38244ad3eb2fd96cd93f4dafd012' ]]
+}

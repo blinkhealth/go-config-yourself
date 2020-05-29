@@ -210,9 +210,9 @@ gcy get CONFIG_FILE KEYPATH
 
 Outputs the plain-text value for `KEYPATH` in `CONFIG_FILE`.
 
-`KEYPATH` refers to a dot-delimited path to values, see `gcy help keypath` for examples.
+`KEYPATH` refers to a dot-delimited path to values, see `gcy help keypath` for examples. When `.` is passed as `KEYPATH`, the whole document will be returned.
 
-If the value at `KEYPATH` is a dictionary or a list, it will be encoded as JSON, with all of the encrypted values within decrypted. If no value `KEYPATH` exists, `gcy get` will fail with exit code 2.
+If the value at `KEYPATH` is a dictionary, list, or `.`, the resulting value will be encoded as JSON, with all of the encrypted values within decrypted. If no value `KEYPATH` exists, `gcy get` will fail with exit code 2.
 
 ```sh
 gcy get config-up-there.yml some.nested.object

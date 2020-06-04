@@ -60,7 +60,7 @@ coverage:
 
 test-deps:
 	# install outside package dir so go.sum is not affected
-	cd / && GO111MODULE=auto go get -u gotest.tools/gotestsum github.com/golangci/golangci-lint/cmd/golangci-lint
+	cd / && GO111MODULE=on go get -u gotest.tools/gotestsum github.com/golangci/golangci-lint/cmd/golangci-lint
 
 # --------------
 # Build

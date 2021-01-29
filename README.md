@@ -1,4 +1,4 @@
-# !!! go-config-yourself is deprecated and should no longer be used for new projects. Use [Vault](https://blinkhealth.atlassian.net/wiki/spaces/DT/pages/1508278334/Using+Vault+for+Secrets) instead.
+# !!! go-config-yourself is deprecated and should no longer be used for new projects. Blinkers should use Vault instead.
 
 # Overview
 

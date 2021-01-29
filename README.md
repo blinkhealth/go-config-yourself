@@ -1,4 +1,6 @@
-# go-config-yourself
+# !!! go-config-yourself is deprecated and should no longer be used for new projects. Use [Vault](https://blinkhealth.atlassian.net/wiki/spaces/DT/pages/1508278334/Using+Vault+for+Secrets) instead.
+
+# Overview
 
 [![Latest stable release](https://img.shields.io/github/v/release/blinkhealth/go-config-yourself?sort=semver)](https://github.com/blinkhealth/go-config-yourself/releases/latest)
 [![Test status](https://github.com/blinkhealth/go-config-yourself/workflows/Tests/badge.svg)](https://github.com/blinkhealth/go-config-yourself/actions?query=branch%3Amaster+event%3Apush)

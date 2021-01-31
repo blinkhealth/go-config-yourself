@@ -16,9 +16,9 @@ func init() {
 	description := multiLineDescription(
 		"Outputs the plain-text value for `KEYPATH` in `CONFIG_FILE`.",
 
-		"`KEYPATH` refers to a dot-delimited path to values, see `gcy help keypath` for examples.",
+		"`KEYPATH` refers to a dot-delimited path to values, see `gcy help keypath` for examples. When `.` is passed as `KEYPATH`, the whole document will be returned.",
 
-		"If the value at `KEYPATH` is a dictionary or a list, it will be encoded as JSON, with all of the encrypted values within decrypted. If no value `KEYPATH` exists, `gcy get` will fail with exit code 2.",
+		"If the value at `KEYPATH` is a dictionary, list, or `.`, the resulting value will be encoded as JSON, with all of the encrypted values within decrypted. If no value `KEYPATH` exists, `gcy get` will fail with exit code 2.",
 	)
 
 	App.Commands = append(App.Commands, &cli.Command{
@@ -51,7 +51,13 @@ func init() {
 
 // Get a value from a config file
 func get(ctx *cli.Context) error {
-	value, err := configFile.Get(ctx.String("keypath"))
+	var value interface{}
+	var err error
+	if ctx.String("keypath") == "." {
+		value, err = configFile.GetAll()
+	} else {
+		value, err = configFile.Get(ctx.String("keypath"))
+	}
 
 	if err != nil {
 		return Exit(err, ExitCodeInputError)

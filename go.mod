@@ -9,7 +9,7 @@ require (
 	github.com/manifoldco/promptui v0.7.0
 	github.com/mitchellh/go-wordwrap v1.0.0
 	github.com/muesli/crunchy v0.0.0-20191002192727-c0afa2da818f
-	github.com/proglottis/gpgme v0.1.0
+	github.com/proglottis/gpgme v0.1.1
 	github.com/sirupsen/logrus v1.4.2
 	github.com/urfave/cli/v2 v2.0.1-0.20191201095458-2dc008dada79
 	github.com/xrash/smetrics v0.0.0-20170218160415-a3153f7040e9 // indirect

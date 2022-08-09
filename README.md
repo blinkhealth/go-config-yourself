@@ -71,6 +71,18 @@ tar xfz gcy-linux-amd64.tgz
 make install
 ```
 
+## Docker
+
+You can build the docker image locally as follows:
+```sh
+docker build --tag gcy .
+```
+
+Now, you can use this (from inside a shell authenticated by aws-vault):
+```sh
+docker run --rm -i -t -v "$PWD":/code --workdir /code -e AWS_REGION=${AWS_REGION} -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} -e AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN} -e AWS_SECURITY_TOKEN=${AWS_SECURITY_TOKEN} -e AWS_SESSION_EXPIRATION=${AWS_SESSION_EXPIRATION} gcy get ./config/kubernetes-prod.yml STRIPE_CLIENT_SECRET
+```
+
 ---
 
 # Usage
